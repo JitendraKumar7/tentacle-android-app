@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Tentacle</string>
+    
+    <string name="sync_menu">Call Sync Log</string>
+    <string name="tentacle_login">Login to Tentacle</string>
+    <string name="retry">Retry</string>
+    
+    <string name="opt_Menu_Audio_Settings">Audio Source</string>    
+    <string name="opt_Menu_Refresh">Refresh</string>
+    <string name="opt_Menu_SyncWifi">Sync Options</string>
+    <string name="opt_Menu_pin">View PIN</string>
+    <string name="opt_Menu_recording">Recording Option</string>
+    <string name="opt_Menu_Ping_Test">Connection Test</string>
+    <string name="opt_Menu_PingToCallStatus">Pending call</string>
+    <!-- <string name="opt_Menu_TentacleDialer">Tentacle Dialer</string> -->
+    <string name="txt_pull_to_refresh">\u21E3  Pull down to refresh&#8230;</string>
+    <item type="integer" name="view_activity_webview_font">100</item>
+   
+    <string name="dialog_Menu_Internet_Connection">Checking Internet Connection</string>
+    <string name="dialog_Menu_Connection_Tentacle_Cloud">Connecting Media Server</string>
+    <string name="dialog_Menu_tentacle_Server">Connecting Tentacle Cloud</string>
+	<string name="dialog_Menu_sending_log">Sending Log Status</string>
+	<string name="dialog_btn_text">Close</string>
+	<string name="dialer_btn_end_call">End Call</string>
+	<string name="dialer_ibtn_speaker">speaker</string>
+    
+</resources>

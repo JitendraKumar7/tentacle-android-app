@@ -1,0 +1,4 @@
+<resources>
+	<!-- <dimen name="staus_icon_width">48dp</dimen> -->
+	<dimen name="startup_activity_logo_height">400dp</dimen>
+</resources>

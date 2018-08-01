@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/opt_Menu_Refresh"
+        android:icon="@android:drawable/ic_popup_sync"      
+        android:title="@string/opt_Menu_Refresh"
+        android:showAsAction="ifRoom" />
+
+    <group>
+        <item
+            android:id="@+id/opt_Menu_SyncWiFi"
+            android:icon="@drawable/ic_action_network_wifi"
+            android:orderInCategory="11"      
+            android:title="@string/opt_Menu_SyncWifi"/>
+         <item
+            android:id="@+id/opt_Menu_PingToCallStatus"
+            android:icon="@android:drawable/ic_menu_call"
+            android:orderInCategory="12"      
+            android:title="@string/opt_Menu_PingToCallStatus"/>
+    </group>
+
+</menu>

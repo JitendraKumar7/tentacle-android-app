@@ -1,0 +1,65 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:drawable/screen_background_light" >
+
+    <TextView
+        android:id="@+id/main_txt_pulltorefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp"
+        android:text="@string/txt_pull_to_refresh"
+        android:textColor="#AAAAAA"
+        android:textSize="20sp"
+        android:textStyle="bold" 
+        android:visibility="gone"/>
+
+    <com.sunoray.tentacle.layout.TableViewSwipeRefreshLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_screen_refreshview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.sunoray.tentacle.ViewActivity"
+        tools:ignore="MergeRootFrame" >
+
+        <RelativeLayout 
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main_screen_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity" >
+
+            <TextView
+                android:id="@+id/alert"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="#65d6f4"
+                android:gravity="center"
+                android:paddingBottom="6dp"
+                android:paddingTop="6dp"
+                android:textColor="#050505"
+                android:textSize="13sp" />
+
+            <ScrollView
+                android:id="@+id/main_screen_scroll_view"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/alert"
+                android:background="#ffffff" >
+
+                <TableLayout
+                    android:id="@+id/table1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="vertical"
+                    android:stretchColumns="1" >
+                </TableLayout>
+            </ScrollView>
+        </RelativeLayout>
+    </com.sunoray.tentacle.layout.TableViewSwipeRefreshLayout>
+</RelativeLayout>

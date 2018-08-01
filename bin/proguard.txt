@@ -1,0 +1,39 @@
+# view AndroidManifest.xml #generated:127
+-keep class com.google.android.gcm.GCMBroadcastReceiver { <init>(...); }
+
+# view AndroidManifest.xml #generated:149
+-keep class com.sunoray.tentacle.GCMIntentService { <init>(...); }
+
+# view AndroidManifest.xml #generated:101
+-keep class com.sunoray.tentacle.MainActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:70
+-keep class com.sunoray.tentacle.StartupActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:81
+-keep class com.sunoray.tentacle.ViewActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:117
+-keep class com.sunoray.tentacle.extraActivity.CallActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:112
+-keep class com.sunoray.tentacle.extraActivity.GCMActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:122
+-keep class com.sunoray.tentacle.extraActivity.MsgViewActivity { <init>(...); }
+
+# view res/layout/activity_main.xml #generated:18
+-keep class com.sunoray.tentacle.layout.TableViewSwipeRefreshLayout { <init>(...); }
+
+# view res/layout/view_activity.xml #generated:21
+-keep class com.sunoray.tentacle.layout.WebViewSwipeRefreshLayout { <init>(...); }
+
+# view AndroidManifest.xml #generated:153
+-keep class com.sunoray.tentacle.service.BackGroundService { <init>(...); }
+
+# view AndroidManifest.xml #generated:141
+-keep class com.sunoray.tentacle.service.CallService { <init>(...); }
+
+# view AndroidManifest.xml #generated:145
+-keep class com.sunoray.tentacle.service.TrackerService { <init>(...); }
+

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" ></script>
+<script language="javascript">
+
+
+window.onload = function(){ 
+	window.tentacle.getLocation("tele_caller");
+}
+
+//window.tentacle.getLocation();
+	//setTimeout(function(){  window.tentacle.getLocation(); }, 500);
+	
+	function setGeoLocation(status,latitude,longitude) {	   
+	       alert("javascript=" + status + latitude + longitude);	   
+	}
+	   
+</script>
+</head>
+<body>  		
+  		<br><br><br>  		   
+  		<form action="getfile" method="post" enctype="multipart/form-data">
+  		aName :<input type="text" name="aname" id="t1"><br>
+  		bName :<input type="text" name="bname" id="t2"><br>
+  		cName :<input type="text" name="cuname"><br>
+  		dName :<input type="text" name="duname" id="transaction_lat"> <br>
+  		File select(accept="image/*") :<input accept="image/*"  capture="camera" name="file" type="file" value="Capture Picture" ><br>
+  		File select(accept="Excel only") :<input id="fileSelect" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel , .csv" /><br>
+  		<input type="button" value="get location with own implemented methods" onclick="getLocation()"><br>
+  		<input type="button" value="Check location with error code" onclick="getLocation2()"><br>
+  		</form>
+	
+ </body>
+</html>

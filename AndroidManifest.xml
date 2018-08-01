@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xml>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sunoray.tentacle"
+    android:versionCode="32"
+    android:versionName="1.4.18">
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="22"
+	/>
+    
+    <!-- Creates a custom permission so only this app can receive its messages. -->
+    <permission
+        android:name="com.sunoray.tentacle.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.sunoray.tentacle.permission.C2D_MESSAGE" />
+
+    <!-- register and receives GCM messages -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <!-- GCM requires a Google account -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.READ_OWNER_DATA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- wake the processor if a GCM message is received -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Access phone no , IEMI no -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    
+    <!-- Calling Permissions -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />
+
+    <!-- Recording Permissions -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Internet Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <!-- Location Access -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_GPS" />
+	<uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
+    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
+    <uses-feature android:name="android.hardware.location.gps" />
+	
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        
+        <activity
+            android:name="com.sunoray.tentacle.StartupActivity"
+            android:configChanges="orientation|screenSize"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.sunoray.tentacle.ViewActivity"
+            android:configChanges="orientation|screenSize"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name" 
+            android:theme="@style/NoTitleBar">
+           <intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="tentacle.sunoray.com" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="tentacle.sunoray.net" />
+			</intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.sunoray.tentacle.MainActivity"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name" >
+            <intent-filter>
+	            <action android:name="android.intent.action.CALL" />
+	            <category android:name="android.intent.category.ALTERNATIVE" />
+	            <data android:scheme="tel" />
+        	</intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.sunoray.tentacle.extraActivity.GCMActivity"
+            android:theme="@android:style/Theme.NoDisplay" >
+        </activity>
+        
+        <activity
+            android:name="com.sunoray.tentacle.extraActivity.CallActivity"
+            android:theme="@android:style/Theme.NoDisplay" >
+        </activity>
+        
+        <activity
+            android:name="com.sunoray.tentacle.extraActivity.MsgViewActivity"
+            android:theme="@android:style/Theme.NoDisplay" >
+        </activity>
+       
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <!-- Receives the registration id. -->
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.sunoray.tentacle" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.sunoray.tentacle.service.CallService"
+            android:exported="false">
+        </service>
+         <service
+            android:name="com.sunoray.tentacle.service.TrackerService"
+            android:exported="false">
+         </service>
+        <service
+            android:name="com.sunoray.tentacle.GCMIntentService"
+            android:exported="false">
+        </service>
+        <service
+            android:name="com.sunoray.tentacle.service.BackGroundService"
+            android:exported="false">
+       </service>
+    </application>
+    
+</manifest>

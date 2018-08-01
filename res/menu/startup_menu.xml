@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    	
+		<item android:id="@+id/opt_Menu_pin"
+			android:icon="@drawable/ic_action_key_icon"    
+	        android:title="@string/opt_Menu_pin"
+	        android:orderInCategory="2"/>
+		<group>       
+		<item android:id="@+id/opt_Menu_recording"
+			android:icon="@drawable/ic_recording"
+			android:title="@string/opt_Menu_recording"
+			android:orderInCategory="4"
+			android:visible="true"
+			 />
+	    <item
+	        android:id="@+id/opt_Menu_Audio_Settings"
+	        android:icon="@drawable/ic_action_volume_on"
+	        android:title="@string/opt_Menu_Audio_Settings"
+	        android:orderInCategory="5"
+	        />
+	    <item android:id="@+id/opt_Menu_Ping_Test"			
+			android:title="@string/opt_Menu_Ping_Test"
+			android:orderInCategory="6"
+			android:visible="true"
+			 />    
+	</group>
+</menu>

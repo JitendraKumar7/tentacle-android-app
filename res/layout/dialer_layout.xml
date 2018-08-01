@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xml>
+       
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:drawable/screen_background_light">
+    
+	 <ImageView
+	 	android:id="@+id/dialer_imgv_icon"
+	 	android:contentDescription="@string/app_name"
+	 	android:layout_width="wrap_content"
+	 	android:layout_height="wrap_content"
+	 	android:layout_alignParentTop="true"
+	 	android:layout_centerHorizontal="true"
+	 	android:layout_marginLeft="40dp"
+	 	android:layout_marginRight="40dp"
+	 	android:layout_marginTop="50dp"
+	 	android:src="@drawable/ic_launcher" />
+	 
+	  <TextView
+        	android:id="@+id/dialer_txt_reciever_name"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_centerHorizontal="true"        
+        	android:gravity="center"
+        	android:textColor="#008658"
+        	android:layout_below="@+id/dialer_imgv_icon"
+        	android:layout_marginTop="44dp"        	
+        	android:textAppearance="?android:attr/textAppearanceLarge" />
+	  
+	   <TextView
+        	android:id="@+id/dialer_txt_status"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_centerHorizontal="true"        
+        	android:gravity="center"
+        	android:textColor="#008658"
+        	android:layout_below="@+id/dialer_txt_reciever_name"
+        	android:layout_marginTop="10dp"        	
+        	android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageButton
+        	android:id="@+id/dialer_ibtn_speaker"
+        	android:contentDescription="@string/dialer_ibtn_speaker"
+        	android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:layout_above="@+id/dialer_btn_endcall"
+        	android:background="#F5F5F5"        	
+        	android:layout_marginBottom="5dp"
+        	android:layout_marginLeft="10dp"
+        	android:layout_marginStart="10dp"
+        	android:layout_marginRight="10dp"
+        	android:src="@drawable/dialer_ic_speaker_green" />
+        
+        <Button            
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/dialer_btn_endcall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/red"
+            android:text="@string/dialer_btn_end_call"/>      
+         
+</RelativeLayout>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xml>
+        
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:drawable/screen_background_light">  
+     
+    <TextView 
+        android:paddingTop="20dp"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:text="@string/txt_pull_to_refresh"
+        android:gravity="center_horizontal"    
+        android:textSize="20sp"
+        android:textColor="#AAAAAA"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:id="@+id/view_txt_pulltorefresh"/>
+    
+    <com.sunoray.tentacle.layout.WebViewSwipeRefreshLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/view_swipeprogressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.sunoray.tentacle.ViewActivity"
+        tools:ignore="MergeRootFrame" >       
+
+        <WebView
+            android:id="@+id/view_webview_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:visibility="visible" >
+        </WebView>
+        
+       
+    </com.sunoray.tentacle.layout.WebViewSwipeRefreshLayout>
+
+    <ProgressBar
+        android:id="@+id/view_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:progressDrawable="@drawable/progress_color"
+        android:visibility="gone" />
+    <!--  <LinearLayout
+        android:id="@+id/view_linear_oncall_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"        
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="0dp"
+        android:background="@color/orange"   
+        android:visibility="gone"    
+        android:orientation="vertical">
+
+        <Button
+             android:id="@+id/view_btn_endcall"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:background="@color/red"
+             android:text="End Call"/>
+        
+    </LinearLayout> -->
+
+    <ProgressBar
+        android:id="@+id/view_fore_progressBar"
+        style="android:progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center" />
+    
+    </RelativeLayout>
+  
