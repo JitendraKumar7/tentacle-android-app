@@ -1,0 +1,18 @@
+<resources>
+
+    <!--
+        Base application theme for API 18+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    -->
+     <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        API 18 (4.3) theme customizations can go here.
+    </style>
+
+     <style name="NoTitleBar" parent="@android:style/Theme.Translucent.NoTitleBar">
+    </style>
+
+    <style name="Nodisplay" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+</resources>
