@@ -229,9 +229,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //Log.i("DatabaseHandler", "Checking callid");
         boolean recording = false;
         try {
-            String[] columns = {KEY_ID};
+            String[] columns = {KEY_ID, KEY_DURATION};
             db = this.getWritableDatabase();
             cursor = db.query(TABLE_RECORDINGS, columns, KEY_CALLID + " = '" + callid + "'", null, null, null, null);
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst()) {
+                recording = true;
+                //Log.i("DatabaseHandler", "callid exist: " + recording);
+            }
+        } catch (Exception e) {
+            log.debug("Exception @ checkRecording:", e);
+            recording = false;
+        } finally {
+            attemptClose(cursor);
+            attemptClose(db);
+        }
+        return recording;
+    }
+
+    public boolean checkRecordingForRecall(String callid) {
+        //Log.i("DatabaseHandler", "Checking callid");
+        boolean recording = false;
+        try {
+            String[] columns = {KEY_ID, KEY_DURATION};
+            db = this.getWritableDatabase();
+            cursor = db.query(TABLE_RECORDINGS, columns, KEY_CALLID + " = '" + callid + "' AND " + KEY_DURATION + " >= 1", null, null, null, null);
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 recording = true;
