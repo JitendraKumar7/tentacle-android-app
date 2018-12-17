@@ -2,6 +2,7 @@ package com.sunoray.tentacle.service;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.view.WindowManager;
 
 import com.sunoray.tentacle.common.AppProperties;
@@ -103,7 +104,11 @@ public class CallBarring extends PhoneCallReceiver {
                 isRecording = false;
                 log.info("Inbound recording stopped, asking for save ?");
                 InboundDialog dialog = new InboundDialog(context, rec);
-                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+                } else {
+                    dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);
+                }
                 dialog.show();
                 // Saving Call duration in Rec
                 AsyncTask<Recording, Void, String> aTask = new AddRecording(context);

@@ -54,6 +54,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
+        android:name=".application.ApplicationExtension"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -162,7 +163,23 @@
             android:exported="false" />
         <service
             android:name="com.sunoray.tentacle.service.BackGroundService"
-            android:exported="false" />
+            android:exported="false" >
+            <intent-filter>
+                <action android:name=".service.BackGroundService" />
+            </intent-filter>
+        </service>
+
+        <!--Registering NotificationService here-->
+        <service android:name=".service.NotificationService">
+            <intent-filter>
+                <action android:name=".service.NotificationService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.CheckNotificationStatus"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
 
     </application>
 

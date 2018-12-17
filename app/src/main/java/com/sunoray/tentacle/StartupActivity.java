@@ -12,9 +12,13 @@ import org.slf4j.LoggerFactory;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +34,7 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -51,6 +56,8 @@ import com.sunoray.tentacle.helper.PermissionRequest;
 import com.sunoray.tentacle.helper.StorageHandler;
 import com.sunoray.tentacle.network.HttpServices;
 import com.sunoray.tentacle.service.CallBarring;
+import com.sunoray.tentacle.service.CheckNotificationStatus;
+import com.sunoray.tentacle.service.NotificationService;
 import com.sunoray.tentacle.service.TrackerService;
 import android.Manifest;
 
@@ -67,6 +74,7 @@ public class StartupActivity extends Activity {
     TextView btnSignUp;
     Button retry;
     MenuItem optMenuAudioSettings;
+    public static final int CHECKER_JOB_ID = 12;
 
     BroadcastReceiver incomingCallReceiver = new CallBarring();
 
@@ -138,6 +146,21 @@ public class StartupActivity extends Activity {
 
         IntentFilter filter = new IntentFilter(TelephonyManager.EXTRA_STATE);
         registerReceiver(incomingCallReceiver, filter);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setCheckerJob() {
+        try {
+            JobScheduler jobScheduler =
+                    (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            jobScheduler.schedule(new JobInfo.Builder(CHECKER_JOB_ID,
+                    new ComponentName(this, CheckNotificationStatus.class))
+                    .setRequiresDeviceIdle(true)    // device should be idle
+                    .setPeriodic(1 * 60 * 1000)         // 1 min
+                    .build());
+        } catch (Exception e) {
+            log.debug("Exception in setCheckerJob", e);
+        }
     }
 
     @Override
@@ -311,6 +334,21 @@ public class StartupActivity extends Activity {
                     && PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.TrackInboundOption, "1").equalsIgnoreCase("0")) {
                 checkOverlayPermission(StartupActivity.this);
             }
+
+            // starting notification service here
+            if (PreferenceUtil.getSharedPreferences(getBaseContext(),
+                    PreferenceUtil.TrackInboundOption, "1").equalsIgnoreCase("0")) {
+                Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                ContextCompat.startForegroundService(StartupActivity.this, intentService);
+            } else {
+                Intent serviceIntent = new Intent(StartupActivity.this, NotificationService.class);
+                stopService(serviceIntent);
+            }
+
+            //setting notification Job scheduler checker
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                setCheckerJob();
+
             alert.setVisibility(View.GONE);
             retry.setVisibility(View.GONE);
             renderAfterReg();
@@ -555,9 +593,14 @@ public class StartupActivity extends Activity {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.TrackInboundOption, "1").equalsIgnoreCase("0")) {
+                                    Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                                    ContextCompat.startForegroundService(StartupActivity.this, intentService);
                                     checkOverlayPermission(StartupActivity.this);
-                                } else
+                                } else {
                                     Toast.makeText(getBaseContext(), "Track Incoming Calls Turned " + PreferenceUtil.getTrackInboundOption()[Integer.parseInt(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.TrackInboundOption, "1"))], Toast.LENGTH_SHORT).show();
+                                    Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                                    stopService(intentService);
+                                }
                             }
                         }).create().show();
                 return true;

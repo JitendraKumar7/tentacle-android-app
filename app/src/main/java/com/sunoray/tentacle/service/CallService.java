@@ -15,6 +15,7 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.Gravity;
@@ -25,6 +26,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.sunoray.tentacle.R;
+import com.sunoray.tentacle.StartupActivity;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.CommonField;
 import com.sunoray.tentacle.common.PreferenceUtil;
@@ -269,7 +271,8 @@ public class CallService extends Service {
 		log.debug("Call Service is Stopped");
 		closeTDialer();
 		AppProperties.isCallServiceRunning = false;
-		startService(new Intent(getBaseContext(), BackGroundService.class));
+		Intent intentService = new Intent(getBaseContext(), BackGroundService.class);
+		ContextCompat.startForegroundService(getBaseContext(), intentService);
 		if (media != null && media.recState.equalsIgnoreCase("ON")) {
 			media.stopRecording();
 		}

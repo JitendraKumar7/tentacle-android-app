@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -174,7 +175,8 @@ public class TentacleJSInterface {
                         rec.setPath(fullPath);
                         dh.updateRecordingInbound(rec);
                     }
-                    context.startService(new Intent(context, BackGroundService.class));
+                    Intent intentService = new Intent(context, BackGroundService.class);
+                    ContextCompat.startForegroundService(context, intentService);
                 }
             }
         } catch (Exception e) {
