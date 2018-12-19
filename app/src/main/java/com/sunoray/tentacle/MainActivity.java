@@ -312,7 +312,11 @@ public class MainActivity extends Activity {
                         try {
                             if (recording.getStatus().equalsIgnoreCase("INBOUND")) {
                                 InboundDialog dialog = new InboundDialog(MainActivity.this, recording);
-                                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+                                } else {
+                                    dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);
+                                }
                                 dialog.show();
                                 // String urlEncoded = URLEncoder.encode(recording.getPhoneNumber(), "UTF-8");
                                 //

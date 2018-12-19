@@ -142,10 +142,9 @@ public class PingTestFragment extends DialogFragment {
 
 	private void sendLogToServer() {
 		try {
-			AsyncTask<String, Void, Boolean> aTask = new SendLogFile(getActivity().getApplicationContext(), txtSentDeviceDetail);
-			aTask.execute();
+			new SendLogFile(getActivity(), txtSentDeviceDetail).execute();
 		} catch (Exception e) {
-			log.debug("Exception: " + e);
+			log.debug("Exception at sendLogToServer: " + e);
 		}
 	}
 
