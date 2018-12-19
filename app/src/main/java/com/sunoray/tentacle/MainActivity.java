@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -121,7 +122,8 @@ public class MainActivity extends Activity {
         registerReceiver(tentacleReceiver, tentacleReceiverFilter);
         reloadView();
         // Start background Service.
-        startService(new Intent(getBaseContext(), BackGroundService.class));
+        Intent intentService = new Intent(getBaseContext(), BackGroundService.class);
+        ContextCompat.startForegroundService(getBaseContext(), intentService);
     }
 
     @Override
@@ -145,7 +147,8 @@ public class MainActivity extends Activity {
             case R.id.opt_Menu_Refresh:
                 checkAppPrerequisite();
                 displayCallRecodedList();
-                startService(new Intent(getBaseContext(), BackGroundService.class));
+                Intent intentService = new Intent(getBaseContext(), BackGroundService.class);
+                ContextCompat.startForegroundService(getBaseContext(), intentService);
                 return true;
 
             case R.id.opt_Menu_SyncWiFi:
