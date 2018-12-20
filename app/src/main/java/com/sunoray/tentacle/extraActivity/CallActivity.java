@@ -91,7 +91,7 @@ public class CallActivity extends Activity {
                 log.debug("Paramater Missing");
             }
         } catch (Exception e) {
-            log.debug("Error Occured: ", e);
+            log.debug("Error Occurred: ", e);
         }
     }
 

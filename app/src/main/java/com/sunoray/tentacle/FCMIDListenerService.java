@@ -1,30 +1,10 @@
 package com.sunoray.tentacle;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sunoray.tentacle.common.PreferenceUtil;
-import com.sunoray.tentacle.common.Util;
-import com.sunoray.tentacle.helper.PermissionRequest;
-import com.sunoray.tentacle.helper.StorageHandler;
-
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import okhttp3.Response;
 
 public class FCMIDListenerService extends FirebaseInstanceIdService {
     /**
