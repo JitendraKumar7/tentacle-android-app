@@ -102,11 +102,12 @@ public class CallActivity extends Activity {
                 // Setting Starting Dial Time in rec
                 rec.setDialTime(System.currentTimeMillis());
 
+                Intent callService = new Intent(this, com.sunoray.tentacle.service.CallService.class);
+
                 // Stopping service if running in background
-                stopService(new Intent(this, com.sunoray.tentacle.service.CallService.class));
+                stopService(callService);
 
                 // Starting Call Listener Service
-                Intent callService = new Intent(this, com.sunoray.tentacle.service.CallService.class);
                 callService.putExtra(CommonField.RECORDING, rec);
                 startService(callService);
 
