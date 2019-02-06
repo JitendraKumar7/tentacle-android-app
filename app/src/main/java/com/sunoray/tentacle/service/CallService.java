@@ -26,6 +26,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.sunoray.tentacle.R;
+import com.sunoray.tentacle.StartupActivity;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.CommonField;
 import com.sunoray.tentacle.common.PreferenceUtil;
