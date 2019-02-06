@@ -22,6 +22,7 @@ public class PreferenceUtil {
     public static final String storageDrive = "storageDrive";
     public static final String MIN_DISTANCE_CHANGE_FOR_UPDATES = "minDistance";    // The minimum distance to change Updates in meters
     public static final String MIN_TIME_BW_UPDATES = "minTime";
+    public static final String FCM_IS_UPDATED = "fcmIsUpdated";
 
     private static final String[] SyncOption_ITEM = {"Sync Anytime" + "\n" + "Data charges may apply.", "Sync over Wi-Fi only"};
     private static final String[] AUDIOSOURCE_ITEM = {"MIC", "VOICE CALL", "VOICE COMMUNICATION"};
