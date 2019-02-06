@@ -1,13 +1,13 @@
 package com.sunoray.tentacle.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.telephony.TelephonyManager;
 
 import java.util.Date;
 
-public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
+public abstract class PhoneCallReceiver extends BroadcastReceiver {
 
     //The receiver will be recreated whenever android feels like it.  We need a static variable to remember data between instantiations
 

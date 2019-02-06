@@ -85,7 +85,7 @@ public class CallActivity extends Activity {
                 log.debug("Paramater Missing");
             }
         } catch (Exception e) {
-            log.debug("Error Occured: ", e);
+            log.debug("Error Occurred: ", e);
         }
     }
 
@@ -96,8 +96,12 @@ public class CallActivity extends Activity {
                 // Setting Starting Dial Time in rec
                 rec.setDialTime(System.currentTimeMillis());
 
-                // Starting Call Listener Service
                 Intent callService = new Intent(this, com.sunoray.tentacle.service.CallService.class);
+
+                // Stopping service if running in background
+                stopService(callService);
+
+                // Starting Call Listener Service
                 callService.putExtra(CommonField.RECORDING, rec);
                 startService(callService);
 
