@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "375051463289",
+    "firebase_url": "https://dev-tentacle-561.firebaseio.com",
+    "project_id": "dev-tentacle-561",
+    "storage_bucket": "dev-tentacle-561.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:375051463289:android:74f5e83c08c34d32",
+        "android_client_info": {
+          "package_name": "com.sunoray.tentacle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "375051463289-aicngf5832g8djiepf5lpq8l1fei3458.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3uTKObhgw75vUgofiLq0M5OXHdQGmuI0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

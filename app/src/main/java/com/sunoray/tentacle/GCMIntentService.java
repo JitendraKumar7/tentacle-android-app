@@ -29,7 +29,9 @@ import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gcm.GCMBaseIntentService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import com.sunoray.tentacle.application.ApplicationExtension;
 import com.sunoray.tentacle.bean.LocationBean;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.CommonField;
@@ -45,23 +47,22 @@ import com.sunoray.tentacle.tasks.SendCurrentLocation;
 import com.sunoray.tentacle.tasks.SendStatus;
 import com.sunoray.tentacle.tasks.SendUserTrack;
 
-@SuppressWarnings("deprecation")
-public class GCMIntentService extends GCMBaseIntentService {
+public class GCMIntentService extends FirebaseMessagingService {
 
     private static final Logger log = LoggerFactory.getLogger(GCMIntentService.class);
     static int reqCall = 0; // To Create New Notification Every Time
     static Queue<String> callidqueue = new LinkedList<String>();
 
     public GCMIntentService() {
-        super(AppProperties.PROJECT_ID);
         log.info("Msg Receiver Services is Started");
     }
 
     @Override
-    protected void onMessage(Context context, Intent intent) {
+    public void onMessageReceived(RemoteMessage message) {
         try {
-            String serverType = intent.getStringExtra("server_type");
-            String alertType = intent.getStringExtra("alert_type") == null ? "call" : intent.getStringExtra("alert_type");
+            Map<String, String> data = message.getData();
+            String serverType = data.get("server_type");
+            String alertType = data.get("alert_type") == null ? "call" : data.get("alert_type");
 
             log.debug("New Push notification Request type: " + alertType);
             if (alertType.equalsIgnoreCase("log")) {
@@ -69,42 +70,41 @@ public class GCMIntentService extends GCMBaseIntentService {
                 sendLogToServer();
             } else if (alertType.equalsIgnoreCase("call")) {
 
-                String number = intent.getStringExtra("number");
-                String callId = intent.getStringExtra("call_id");
+                String number = data.get("number");
+                String callId = data.get("call_id");
 
                 log.debug("New Call alert | id: " + callId + " | server:" + serverType);
 
                 if (!(Util.isNull(callId) || Util.isNull(number))) {
                     if (matchHitQueue(number, callId)) {
                         log.debug("Duplicate Call Request");
-                        sendNotification(context, number, callId, serverType, intent);
+                        sendNotification(getBaseContext(), number, callId, serverType, data);
                     } else {
                         addHitQueue(number, callId);
                         reqCall++;
-                        sendNotification(context, number, callId, serverType, intent);
+                        sendNotification(getBaseContext(), number, callId, serverType, data);
                     }
                 } else {
                     log.debug("Got NULL Call Request. Request Ignored");
                 }
             } else if (alertType.equalsIgnoreCase("redirect")) {
                 reqCall++;
-                sendNotification(context, serverType, intent);
+                sendNotification(getBaseContext(), serverType, data);
             } else if (alertType.equalsIgnoreCase("flash")) {
-                String message = intent.getStringExtra("number");
-                sendMsg(context, message);
+                sendMsg(getBaseContext(), data.get("number"));
             } else if (alertType.equalsIgnoreCase("location")) {
                 log.info("location received");
-                sendCurrentLocation(context);
+                sendCurrentLocation(getBaseContext());
             } else if (alertType.equalsIgnoreCase("sharedpreference")) {
-                String token = intent.getStringExtra("token");
-                if (token.equalsIgnoreCase(PreferenceUtil.getSharedPreferences(context, PreferenceUtil.AUTHTOKEN, ""))) {
-                    String key = intent.getStringExtra("key");
-                    String value = intent.getStringExtra("value");
-                    sendSharedPreference(context, key, value, alertType);
+                String token = data.get("token");
+                if (token.equalsIgnoreCase(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.AUTHTOKEN, ""))) {
+                    String key = data.get("key");
+                    String value = data.get("value");
+                    sendSharedPreference(getBaseContext(), key, value, alertType);
                 }
             } else if (alertType.equalsIgnoreCase("hangup")) {
                 log.info("Hangup Call Request from GSM");
-                CallHelper.endCall(context);
+                CallHelper.endCall(getBaseContext());
             }
         } catch (Exception e) {
             log.debug("Error at onMessage: ", e);
@@ -198,18 +198,14 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
-    @Override
-    protected void onUnregistered(Context ctx, String regId) {
-    }
-
-    protected void sendNotification(Context context, String number, String callId, String serverType, Intent intent) {
+    protected void sendNotification(Context context, String number, String callId, String serverType, Map<String, String> data) {
 
         //Creating Recording Object.
         Recording rec = new Recording();
         rec.setCallId(callId);
         rec.setPhoneNumber(number);
 
-        String numberFlag = intent.getExtras().getString("hide_number");
+        String numberFlag = data.get("hide_number");
 
         log.info("numberFlag=" + numberFlag);
         if (numberFlag != null && numberFlag.equalsIgnoreCase("true")) {
@@ -219,14 +215,14 @@ public class GCMIntentService extends GCMBaseIntentService {
         }
 
         rec.setServerType(serverType);
-        rec.setAccountId(intent.getExtras().getString("account_id"));
-        rec.setCampaignId(intent.getExtras().getString("campaign_id"));
-        rec.setProspectId(intent.getExtras().getString("prospect_id"));
+        rec.setAccountId(data.get("account_id"));
+        rec.setCampaignId(data.get("campaign_id"));
+        rec.setProspectId(data.get("prospect_id"));
 
         // Sending delivery ACK to TC
         JSONObject jsonObj = new JSONObject();
         try {
-            String alertType = intent.getStringExtra("alert_type");
+            String alertType = data.get("alert_type");
             jsonObj.put("alert_type", alertType);
             jsonObj.put("call_no", number);
             jsonObj.put("call_id", callId);
@@ -253,9 +249,15 @@ public class GCMIntentService extends GCMBaseIntentService {
             } else {
                 Intent nextIntent = new Intent(getApplicationContext(), com.sunoray.tentacle.extraActivity.GCMActivity.class);
                 nextIntent.putExtra(CommonField.RECORDING, rec);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        getApplicationContext(),
+                        0,
+                        nextIntent,
+                        0);
 
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                Notification notification = new NotificationCompat.Builder(getApplicationContext())
+                Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                        ApplicationExtension.ALERT_CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Pending calls")
                         .setLights(Color.GREEN, 1000, 2000)
@@ -271,13 +273,13 @@ public class GCMIntentService extends GCMBaseIntentService {
         }
     }
 
-    protected void sendNotification(Context context, String serverType, Intent intent) {
+    protected void sendNotification(Context context, String serverType, Map<String, String> data) {
 
-        String action = intent.getStringExtra("action");
-        String alertType = intent.getStringExtra("alert_type");
-        String ackData = intent.getStringExtra("ack_data");
-        String title = intent.getStringExtra("title");
-        String content = intent.getStringExtra("content");
+        String action = data.get("action");
+        String alertType = data.get("alert_type");
+        String ackData = data.get("ack_data");
+        String title = data.get("title");
+        String content = data.get("content");
 
         // Sending Delivery ACK to Server
         JSONObject jsonObj = new JSONObject();

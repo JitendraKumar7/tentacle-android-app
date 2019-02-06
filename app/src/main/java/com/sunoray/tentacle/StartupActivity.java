@@ -9,8 +9,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -29,7 +27,6 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -47,7 +44,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gcm.GCMRegistrar;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.PreferenceUtil;
 import com.sunoray.tentacle.common.Util;
@@ -56,9 +52,10 @@ import com.sunoray.tentacle.helper.PermissionRequest;
 import com.sunoray.tentacle.helper.StorageHandler;
 import com.sunoray.tentacle.network.HttpServices;
 import com.sunoray.tentacle.service.CallBarring;
-import com.sunoray.tentacle.service.CheckNotificationStatus;
-import com.sunoray.tentacle.service.NotificationService;
+import com.sunoray.tentacle.service.CheckKeepAliveStatus;
+import com.sunoray.tentacle.service.KeepAliveService;
 import com.sunoray.tentacle.service.TrackerService;
+
 import android.Manifest;
 
 import okhttp3.Response;
@@ -120,43 +117,30 @@ public class StartupActivity extends Activity {
 
         pb.setEnabled(true);
 
-        sendBroadcast(new Intent("com.google.android.intent.action.GTALK_HEARTBEAT"));
-        sendBroadcast(new Intent("com.google.android.intent.action.MCS_HEARTBEAT"));
-
-        if (checkAppPrerequisite()) {
-            if (!PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "").equals(GCMRegistrar.getRegistrationId(getApplicationContext()))) {
-                getSharedPreferences(AppProperties.PREFERANCE_FILENAME_STRING, Context.MODE_PRIVATE).edit().clear().commit();
-                log.info("clear regId & pin which is not same" + PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "") + PreferenceUtil.getSharedPreferences(this, PreferenceUtil.PINID, ""));
-                registerClient();
-            }
-        }
+        checkAppPrerequisite();
 
         retry.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 retry.setVisibility(View.GONE);
-                if (checkAppPrerequisite())
-                    if (!PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.REGID, "").equals(GCMRegistrar.getRegistrationId(getApplicationContext()))) {
-                        getSharedPreferences(AppProperties.PREFERANCE_FILENAME_STRING, Context.MODE_PRIVATE).edit().clear().commit();
-                        log.info("clear regId & pin which is not same" + PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.REGID, "") + PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.PINID, ""));
-                        registerClient();
-                    }
+                checkAppPrerequisite();
             }
         });
 
         IntentFilter filter = new IntentFilter(TelephonyManager.EXTRA_STATE);
         registerReceiver(incomingCallReceiver, filter);
+
+
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setCheckerJob() {
         try {
-            JobScheduler jobScheduler =
-                    (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(new JobInfo.Builder(CHECKER_JOB_ID,
-                    new ComponentName(this, CheckNotificationStatus.class))
+                    new ComponentName(this, CheckKeepAliveStatus.class))
                     .setRequiresDeviceIdle(true)    // device should be idle
-                    .setPeriodic(1 * 60 * 1000)         // 1 min
+                    .setPeriodic(10 * 60 * 1000)     // 10 min
                     .build());
         } catch (Exception e) {
             log.debug("Exception in setCheckerJob", e);
@@ -286,8 +270,6 @@ public class StartupActivity extends Activity {
         alert.setVisibility(View.VISIBLE);
         pb.setVisibility(View.VISIBLE);
         ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        AccountManager accMan = AccountManager.get(this);
-        Account[] accArray = accMan.getAccountsByType("com.google");
         // check SDCard
         try {
             if ((PreferenceUtil.getSharedPreferences(this, PreferenceUtil.storageDrive, "").isEmpty())) {
@@ -306,21 +288,23 @@ public class StartupActivity extends Activity {
                 pb.setVisibility(View.GONE);
                 return false;
             }
-            // check Google account
+            /*// check Google account
             else if (android.os.Build.VERSION.SDK_INT < 16 && accArray.length < 1) {
                 alert.setText("Please sing-in to Play Store");
                 retry.setVisibility(View.VISIBLE);
                 pb.setVisibility(View.GONE);
                 return false;
-            }
+            }*/
             // check GCM registration
-            else if (PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "").isEmpty()) {
+            else if (!PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "").isEmpty()
+                    && PreferenceUtil.getSharedPreferences(this,PreferenceUtil.FCM_IS_UPDATED,"false").equalsIgnoreCase("true")) {
                 alert.setText("Registering Device...");
-                registerClient();
+                sendRegistrationToServer();
                 return false;
             }
             // check PIN.
-            else if (PreferenceUtil.getSharedPreferences(this, PreferenceUtil.PINID, "").isEmpty()) {
+            else if (PreferenceUtil.getSharedPreferences(this, PreferenceUtil.PINID, "").isEmpty()
+                    && !PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "").isEmpty()) {
                 sendRegistrationToServer();
                 return false;
             } else if (cm.getActiveNetworkInfo() == null) {
@@ -338,10 +322,10 @@ public class StartupActivity extends Activity {
             // starting notification service here
             if (PreferenceUtil.getSharedPreferences(getBaseContext(),
                     PreferenceUtil.TrackInboundOption, "1").equalsIgnoreCase("0")) {
-                Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                Intent intentService = new Intent(StartupActivity.this, KeepAliveService.class);
                 ContextCompat.startForegroundService(StartupActivity.this, intentService);
             } else {
-                Intent serviceIntent = new Intent(StartupActivity.this, NotificationService.class);
+                Intent serviceIntent = new Intent(StartupActivity.this, KeepAliveService.class);
                 stopService(serviceIntent);
             }
 
@@ -358,7 +342,7 @@ public class StartupActivity extends Activity {
         }
     }
 
-    public void registerClient() {
+    /*public void registerClient() {
         String regId;
         log.info("Registration Check...");
         alert.setVisibility(View.GONE);
@@ -399,11 +383,10 @@ public class StartupActivity extends Activity {
         } catch (Exception e) {
             log.debug("Error registerClient ", e);
         }
-    }
+    }*/
 
     @SuppressLint("NewApi")
     private void sendRegistrationToServer() {
-
         log.debug("Generating PIN");
         alert.setText("Generating Device PIN..");
         alert.setVisibility(View.VISIBLE);
@@ -418,7 +401,7 @@ public class StartupActivity extends Activity {
                     PreferenceUtil.setSharedPreferences(this, PreferenceUtil.AudioSource, "1");
             }
             // IF PIN is not stored on device
-            if (PreferenceUtil.getSharedPreferences(this, PreferenceUtil.PINID, "").isEmpty()) {
+            if (PreferenceUtil.getSharedPreferences(this,PreferenceUtil.FCM_IS_UPDATED,"false").equalsIgnoreCase("true")) {
                 if (android.os.Build.VERSION.SDK_INT > 9) {
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
@@ -452,6 +435,7 @@ public class StartupActivity extends Activity {
                     if (resp.length() == 6) {
                         PreferenceUtil.setSharedPreferences(this, PreferenceUtil.PINID, resp);
                         PreferenceUtil.setSharedPreferences(getBaseContext(), PreferenceUtil.isServiceStarted, "false");
+                        PreferenceUtil.setSharedPreferences(this, PreferenceUtil.FCM_IS_UPDATED, "false");
                         alert.setVisibility(View.GONE);
                         renderAfterReg();
                         return;
@@ -463,6 +447,7 @@ public class StartupActivity extends Activity {
                             PreferenceUtil.setSharedPreferences(this, PreferenceUtil.MIN_TIME_BW_UPDATES, jObject.getString(PreferenceUtil.MIN_TIME_BW_UPDATES));
                         }
                         PreferenceUtil.setSharedPreferences(getBaseContext(), "isServiceStarted", "false");
+                        PreferenceUtil.setSharedPreferences(this, PreferenceUtil.FCM_IS_UPDATED, "false");
                         alert.setVisibility(View.GONE);
                         renderAfterReg();
                         return;
@@ -491,7 +476,7 @@ public class StartupActivity extends Activity {
         }
     }
 
-    private void registerGCM() {
+    /*private void registerGCM() {
         try {
             Handler tempHandler = new Handler(getMainLooper());
             tempHandler.post(new Runnable() {
@@ -504,7 +489,7 @@ public class StartupActivity extends Activity {
             log.debug("Error occurred while GCM Registration");
             return;
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -593,12 +578,12 @@ public class StartupActivity extends Activity {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.TrackInboundOption, "1").equalsIgnoreCase("0")) {
-                                    Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                                    Intent intentService = new Intent(StartupActivity.this, KeepAliveService.class);
                                     ContextCompat.startForegroundService(StartupActivity.this, intentService);
                                     checkOverlayPermission(StartupActivity.this);
                                 } else {
                                     Toast.makeText(getBaseContext(), "Track Incoming Calls Turned " + PreferenceUtil.getTrackInboundOption()[Integer.parseInt(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.TrackInboundOption, "1"))], Toast.LENGTH_SHORT).show();
-                                    Intent intentService = new Intent(StartupActivity.this, NotificationService.class);
+                                    Intent intentService = new Intent(StartupActivity.this, KeepAliveService.class);
                                     stopService(intentService);
                                 }
                             }
