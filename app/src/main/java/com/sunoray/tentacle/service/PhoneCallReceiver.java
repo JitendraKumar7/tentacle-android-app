@@ -1,14 +1,14 @@
 package com.sunoray.tentacle.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.telephony.TelephonyManager;
 
 import java.util.Date;
 import java.util.Objects;
 
-public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
+public abstract class PhoneCallReceiver extends BroadcastReceiver {
 
     //The receiver will be recreated whenever android feels like it.  We need a static variable to remember data between instantiations
 
@@ -42,13 +42,10 @@ public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
 
     //Derived classes should override these to respond to specific events of interest
     protected abstract void onIncomingCallReceived(Context ctx, String number, Date start);
-
     protected abstract void onIncomingCallAnswered(Context ctx, String number, Date start);
-
     protected abstract void onIncomingCallEnded(Context ctx, String number, Date start, Date end);
 
     protected abstract void onOutgoingCallStarted(Context ctx, String number, Date start);
-
     protected abstract void onOutgoingCallEnded(Context ctx, String number, Date start, Date end);
 
     protected abstract void onMissedCall(Context ctx, String number, Date start);
@@ -58,7 +55,7 @@ public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
     //Incoming call-  goes from IDLE to RINGING when it rings, to OFFHOOK when it's answered, to IDLE when its hung up
     //Outgoing call-  goes from IDLE to OFFHOOK when it dials out, to IDLE when hung up
     public void onCallStateChanged(Context context, int state, String number) {
-        if (lastState == state) {
+        if(lastState == state){
             //No change, debounce extras
             return;
         }
@@ -71,7 +68,7 @@ public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 //Transition of ringing->offhook are pickups of incoming calls.  Nothing done on them
-                if (lastState != TelephonyManager.CALL_STATE_RINGING) {
+                if(lastState != TelephonyManager.CALL_STATE_RINGING) {
                     isIncoming = false;
                     callStartTime = new Date();
                     onOutgoingCallStarted(context, savedNumber, callStartTime);
@@ -86,7 +83,7 @@ public abstract class PhoneCallReceiver extends WakefulBroadcastReceiver {
                 if (lastState == TelephonyManager.CALL_STATE_RINGING) {
                     //Ring but no pickup -  a miss
                     onMissedCall(context, savedNumber, callStartTime);
-                } else if (isIncoming) {
+                } else if(isIncoming) {
                     onIncomingCallEnded(context, savedNumber, callStartTime, new Date());
                 } else {
                     onOutgoingCallEnded(context, savedNumber, callStartTime, new Date());

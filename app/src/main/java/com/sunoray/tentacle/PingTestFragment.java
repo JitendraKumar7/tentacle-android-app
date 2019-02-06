@@ -25,7 +25,7 @@ import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.PreferenceUtil;
 import com.sunoray.tentacle.network.NetworkUtil;
 import com.sunoray.tentacle.service.TrackerService;
-import com.sunoray.tentacle.tasks.EevaluatingApp;
+import com.sunoray.tentacle.tasks.EvaluatingApp;
 import com.sunoray.tentacle.tasks.SendLogFile;
 
 public class PingTestFragment extends DialogFragment {
@@ -123,7 +123,7 @@ public class PingTestFragment extends DialogFragment {
 	private void checkTentacleServer() {
 		try {
 			String url = AppProperties.WEB_APP_URL;
-			AsyncTask<String, Void, Boolean> aTask = new EevaluatingApp(getActivity().getApplicationContext(),txtTentacleServerTest,txtShowErrorDetail);
+			AsyncTask<String, Void, Boolean> aTask = new EvaluatingApp(getActivity().getApplicationContext(),txtTentacleServerTest,txtShowErrorDetail);
 			aTask.execute(url);
 		} catch (Exception e) {
 			log.info("Exception=" + e.toString());
@@ -133,7 +133,7 @@ public class PingTestFragment extends DialogFragment {
 	private void checkPingTest() {
 		try {
 			String url = AppProperties.MEDIA_SERVER_URL	+ AppProperties.SERVER_NAME_STRING + "/PingTest";
-			AsyncTask<String, Void, Boolean> aTask = new EevaluatingApp(getActivity().getApplicationContext(), txtPingTest,txtShowErrorDetail);
+			AsyncTask<String, Void, Boolean> aTask = new EvaluatingApp(getActivity().getApplicationContext(), txtPingTest,txtShowErrorDetail);
 			aTask.execute(url);
 		} catch (Exception e) {
 			log.info("Exception" + e.toString());
@@ -142,10 +142,9 @@ public class PingTestFragment extends DialogFragment {
 
 	private void sendLogToServer() {
 		try {
-			AsyncTask<String, Void, Boolean> aTask = new SendLogFile(getActivity().getApplicationContext(), txtSentDeviceDetail);
-			aTask.execute();
+			new SendLogFile(getActivity(), txtSentDeviceDetail).execute();
 		} catch (Exception e) {
-			log.debug("Exception: " + e);
+			log.debug("Exception at sendLogToServer: " + e);
 		}
 	}
 
