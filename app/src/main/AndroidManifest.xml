@@ -141,7 +141,7 @@
         <!--Registering NotificationService here-->
         <service android:name=".service.KeepAliveService">
             <intent-filter>
-                <action android:name=".service.NotificationService" />
+                <action android:name=".service.KeepAliveService" />
             </intent-filter>
         </service>
 

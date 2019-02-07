@@ -1,6 +1,7 @@
 package com.sunoray.tentacle.service;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+import static android.view.WindowManager.LayoutParams.TYPE_PHONE;
 import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
 
 public class CallService extends Service {
@@ -185,16 +188,28 @@ public class CallService extends Service {
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		
 		// create layout for Dialer
-		android.view.WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams(
-    		   MATCH_PARENT, MATCH_PARENT, TYPE_SYSTEM_ERROR, FLAG_NOT_FOCUSABLE
-               | FLAG_LAYOUT_IN_SCREEN
-               | FLAG_LAYOUT_NO_LIMITS
-               | FLAG_NOT_TOUCH_MODAL
-               | FLAG_LAYOUT_INSET_DECOR, TRANSLUCENT);
+		android.view.WindowManager.LayoutParams wmParams;
+
+		// create layout for Dialer
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			wmParams = new WindowManager.LayoutParams(
+					MATCH_PARENT, MATCH_PARENT, TYPE_APPLICATION_OVERLAY, FLAG_NOT_FOCUSABLE
+					| FLAG_LAYOUT_IN_SCREEN
+					| FLAG_LAYOUT_NO_LIMITS
+					| FLAG_NOT_TOUCH_MODAL
+					| FLAG_LAYOUT_INSET_DECOR, TRANSLUCENT);
+		} else {
+			wmParams = new WindowManager.LayoutParams(
+					MATCH_PARENT, MATCH_PARENT, TYPE_PHONE, FLAG_NOT_FOCUSABLE
+					| FLAG_LAYOUT_IN_SCREEN
+					| FLAG_LAYOUT_NO_LIMITS
+					| FLAG_NOT_TOUCH_MODAL
+					| FLAG_LAYOUT_INSET_DECOR, TRANSLUCENT);
+		}
 		
 		// set Dialer
 		LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		tDialerView = li.inflate(R.layout.dialer_layout, null);  
+		tDialerView = Objects.requireNonNull(li).inflate(R.layout.dialer_layout, null);
            									  
 		// Set Dialer Windows special properties 
 		tDialerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
