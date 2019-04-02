@@ -57,20 +57,26 @@ public class CallActivity extends Activity {
                     alertTheme = AlertDialog.THEME_DEVICE_DEFAULT_LIGHT;
                 }
 
-                if (new DatabaseHandler(this).checkRecordingForRecall(rec.getCallId())) {
+                if (new DatabaseHandler(this).checkRecording(rec.getCallId())) {
                     // --------- IF CALLID is already in DB
                     //this.setTheme(R.style.AppTheme);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, alertTheme);
                     alertDialogBuilder.setTitle("Tentacle");
                     // set dialog message
                     alertDialogBuilder
-                            .setMessage("There is an unsaved call with this number." +
-                                    " Save the prospect before making a new call." +
-                                    "\n\nHINT: Select \"Now\" in Follow up if you want to call the same number again.")
+                            .setMessage("There is unsaved call recording with this number." +
+                                    " If you call again you will lose your recording." +
+                                    "\n\nAre you sure you want to call again?")
                             .setCancelable(false)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    log.info("Clicking Ok");
+                                    log.info("Select Recalling");
+                                    checkOverlayPermission(CallActivity.this);
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    log.info("Rejected Recalling.");
                                     dialog.cancel();
                                     CallActivity.this.finish();
                                 }

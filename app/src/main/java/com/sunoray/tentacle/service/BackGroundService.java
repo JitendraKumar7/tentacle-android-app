@@ -32,7 +32,7 @@ public class BackGroundService extends Service {
 	}
 
 	@Override
-    public void onCreate() {
+	public void onCreate() {
 		//starting ongoing notification for creating foreground services
 		startForeground(3, buildForegroundNotification("Sync calls"));
 		log.debug("BackGroundService started");
