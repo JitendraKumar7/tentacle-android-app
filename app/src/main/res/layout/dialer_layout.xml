@@ -48,6 +48,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginStart="10dp"
         android:background="#F5F5F5"
+        android:visibility="gone"
         android:contentDescription="@string/dialer_ibtn_speaker"
         android:src="@drawable/dialer_ic_speaker_green" />
 
