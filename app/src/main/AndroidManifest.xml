@@ -43,6 +43,9 @@
     <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
     <uses-feature android:name="android.hardware.location.gps" />
 
+    <!--Foreground Service permission-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".application.ApplicationExtension"
         android:allowBackup="true"
