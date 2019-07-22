@@ -65,7 +65,6 @@ public class SplashScreen extends AppCompatActivity {
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.READ_CALL_LOG,
                         Manifest.permission.WRITE_CALL_LOG,
-                        Manifest.permission.PROCESS_OUTGOING_CALLS,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.RECORD_AUDIO,

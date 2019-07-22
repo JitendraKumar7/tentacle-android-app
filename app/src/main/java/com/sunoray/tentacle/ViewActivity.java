@@ -140,6 +140,9 @@ public class ViewActivity extends Activity {
         tentacleBrowser.getSettings().setDomStorageEnabled(true);
         tentacleBrowser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         tentacleBrowser.setWebViewClient(new MyBrowser());
+        if (Build.VERSION.SDK_INT > 17) {
+            tentacleBrowser.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        }
 
         tentacleBrowser.setWebChromeClient(new WebChromeClient() {
             // For progress bar
