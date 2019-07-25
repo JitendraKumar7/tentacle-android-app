@@ -64,6 +64,10 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="9f5c51176888b9c2af4221cced017644b7aa2855" />
+
         <activity
             android:name="com.sunoray.tentacle.StartupActivity"
             android:configChanges="orientation|screenSize"
@@ -149,8 +153,8 @@
 
         <service
             android:name=".service.CheckKeepAliveStatus"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true"/>
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service android:name=".FCMIDListenerService">
             <intent-filter>
@@ -159,7 +163,8 @@
         </service>
 
         <!-- [START firebase_service] -->
-        <service android:name="com.sunoray.tentacle.GCMIntentService"
+        <service
+            android:name="com.sunoray.tentacle.GCMIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
