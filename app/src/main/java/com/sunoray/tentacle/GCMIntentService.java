@@ -301,7 +301,8 @@ public class GCMIntentService extends FirebaseMessagingService {
             nextIntent.putExtra("content", content);
 
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification notification = new NotificationCompat.Builder(getApplicationContext())
+            Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                    ApplicationExtension.BACK_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(title)
                     .setLights(Color.GREEN, 1000, 2000)
@@ -336,8 +337,8 @@ public class GCMIntentService extends FirebaseMessagingService {
                 nextIntent.putExtra("message", message);
 
                 NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                Notification notification = new NotificationCompat.Builder(
-                        getApplicationContext())
+                Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                        ApplicationExtension.BACK_CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Tentacle Alert")
                         .setLights(Color.GREEN, 1000, 2000)
@@ -406,7 +407,8 @@ public class GCMIntentService extends FirebaseMessagingService {
     protected void onExtraNotification(Context arg0, String arg1, Intent intent) {
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext())
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext(),
+                ApplicationExtension.BACK_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Tentacle").setLights(Color.RED, 1000, 2000)
                 .setAutoCancel(true).setContentText(arg1);
