@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -26,6 +29,9 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.sunoray.tentacle.R;
+import com.sunoray.tentacle.StartupActivity;
+import com.sunoray.tentacle.ViewActivity;
+import com.sunoray.tentacle.application.ApplicationExtension;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.CommonField;
 import com.sunoray.tentacle.common.PreferenceUtil;
@@ -59,7 +65,8 @@ public class CallService extends Service {
 
     @Override
     public void onCreate() {
-        log.info("Service Created");
+        startForeground(5, buildForegroundNotification("Recording ongoing call"));
+        log.info("CallService Created");
         super.onCreate();
     }
 
@@ -289,7 +296,31 @@ public class CallService extends Service {
         if (media != null && media.recState.equalsIgnoreCase("ON")) {
             media.stopRecording();
         }
+        stopForeground(true);
+        log.info("CallService Stopped");
         super.onDestroy();
+    }
+
+    private Notification buildForegroundNotification(String filename) {
+        Intent notificationIntent = new Intent(getApplicationContext(), ViewActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                notificationIntent,
+                0);
+
+        //To notify : setting icon in case of recording in background
+        Notification builder = new NotificationCompat.Builder(getApplicationContext(),
+                ApplicationExtension.BACK_CHANNEL_ID)
+                .setOngoing(true)
+                .setContentText(filename)
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker("Recording call")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
+
+        return builder;
     }
 
 }
