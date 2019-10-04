@@ -42,6 +42,8 @@ public class Recording implements Serializable {
     }
 
     public String getPath() {
+        if (path == null)
+            return "";
         return path;
     }
 

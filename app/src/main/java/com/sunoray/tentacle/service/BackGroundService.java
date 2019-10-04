@@ -81,7 +81,7 @@ public class BackGroundService extends Service {
 				.setContentText(filename)
 				.setContentIntent(pendingIntent)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setTicker("Listening calls")
+				.setTicker("Monitoring calls")
 				.setPriority(NotificationCompat.PRIORITY_MIN)
 				.build();
 

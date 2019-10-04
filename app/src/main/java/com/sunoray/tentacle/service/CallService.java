@@ -65,7 +65,7 @@ public class CallService extends Service {
 
     @Override
     public void onCreate() {
-        startForeground(5, buildForegroundNotification("Recording ongoing call"));
+        startForeground(5, buildForegroundNotification("On-going Call"));
         log.info("CallService Created");
         super.onCreate();
     }
@@ -316,7 +316,7 @@ public class CallService extends Service {
                 .setContentText(filename)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker("Recording call")
+                .setTicker("On-going Call")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build();
 

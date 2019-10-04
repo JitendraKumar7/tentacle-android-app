@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v13.app.ActivityCompat;
 import android.support.v4.content.WakefulBroadcastReceiver;
@@ -284,7 +286,7 @@ public class ViewActivity extends Activity {
                             }
                     ).show();
         } catch (Exception e) {
-            log.debug("Exception in ImageChooserDialog ",e);
+            log.debug("Exception in ImageChooserDialog ", e);
         }
 
     }
@@ -450,8 +452,18 @@ public class ViewActivity extends Activity {
                 view.loadUrl(url);
                 return true;
             } else {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    if (browserIntent.resolveActivity(getPackageManager()) != null)
+                        startActivity(browserIntent);
+                    else
+                        activityNotFoundAlert();
+                } catch (ActivityNotFoundException e) {
+                    log.info("Exception (startActivity): ", e);
+                    activityNotFoundAlert();
+                } catch (Exception e) {
+                    log.info("Exception (startActivity): ", e);
+                }
                 return true;
             }
         }
@@ -476,6 +488,17 @@ public class ViewActivity extends Activity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             view.loadUrl("file:///android_asset/error.html");
         }
+    }
+
+    private void activityNotFoundAlert() {
+        new AlertDialog.Builder(this, Util.getAlertTheame()).setTitle("Telephony Service Not Found")
+                .setMessage("You have set Custom Telephony Service API for making call, that api is not found in your device. Please check before making call.")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                }).create().show();
     }
 
     @Override
