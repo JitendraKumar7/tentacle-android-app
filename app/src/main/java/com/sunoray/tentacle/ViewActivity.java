@@ -492,7 +492,7 @@ public class ViewActivity extends Activity {
 
     private void activityNotFoundAlert() {
         new AlertDialog.Builder(this, Util.getAlertTheame()).setTitle("Telephony Service Not Found")
-                .setMessage("You have set Custom Telephony Service API for making call, that api is not found in your device. Please check before making call.")
+                .setMessage("The application configured in custom telephony service for making calls is not found. Make sure application is installed before making the call.")
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
