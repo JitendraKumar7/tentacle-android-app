@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -137,7 +138,7 @@ public class StartupActivity extends Activity {
     private void setCheckerJob() {
         try {
             JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            jobScheduler.schedule(new JobInfo.Builder(CHECKER_JOB_ID,
+            Objects.requireNonNull(jobScheduler).schedule(new JobInfo.Builder(CHECKER_JOB_ID,
                     new ComponentName(this, CheckKeepAliveStatus.class))
                     .setRequiresDeviceIdle(true)    // device should be idle
                     .setPeriodic(10 * 60 * 1000)     // 10 min
