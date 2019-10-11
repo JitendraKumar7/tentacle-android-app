@@ -20,6 +20,9 @@ import com.sunoray.tentacle.network.NetworkUtil;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -402,5 +405,34 @@ public class Util {
         ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
         Objects.requireNonNull(actManager).getMemoryInfo(memInfo);
         return memInfo.totalMem;
+    }
+
+    //schedule the start of the service every 10-30seconds
+    @TargetApi(Build.VERSION_CODES.M)
+    public static void scheduleJob(Context context, int jobId, Class serviceClass, long minDelay, long maxDelay) {
+        try {
+            ComponentName serviceComponent = new ComponentName(context, serviceClass);
+            JobInfo.Builder builder = new JobInfo.Builder(jobId, serviceComponent);
+
+            // wait at least
+            builder.setMinimumLatency(minDelay);
+
+            // maximum delay
+            builder.setOverrideDeadline(maxDelay);
+
+            // require unmetered network
+            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
+
+            // device should be idle
+            builder.setRequiresDeviceIdle(true);
+
+            // we don't care if the device is charging or not
+            builder.setRequiresCharging(false);
+
+            JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+            Objects.requireNonNull(jobScheduler).schedule(builder.build());
+        } catch (Exception e) {
+            log.info("Exception in scheduleJob", e);
+        }
     }
 }
