@@ -327,7 +327,8 @@ public class StartupActivity extends Activity {
                     15 * 60 * 1000);    // 15 min
 
             //checking device memory
-            notifyLowMemory();
+            if (Integer.parseInt(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.RecordingOption, "0")) == 0)
+                notifyLowMemory();
 
             alert.setVisibility(View.GONE);
             retry.setVisibility(View.GONE);
