@@ -169,12 +169,14 @@ public class TentacleJSInterface {
                 rec.setServerType(host);
                 rec.setCallId(unique_call_id);
                 if (dh.updateRecordingInbound(rec) > 0) {
-                    String fullPath = StorageHandler.getFileDirPath(context, AppProperties.DEVICE_RECORDING_PATH).getAbsolutePath() + File.separator + unique_call_id + MediaRecording.file_exts[MediaRecording.currentFormat];
-                    if (Util.renameFile(context, rec.getPath(), fullPath)) {
-                        rec.setStatus("NEW");
-                        rec.setPath(fullPath);
-                        dh.updateRecordingInbound(rec);
+                    if (rec.getPath() != null && rec.getPath().length() > 0) {
+                        String fullPath = StorageHandler.getFileDirPath(context, AppProperties.DEVICE_RECORDING_PATH).getAbsolutePath() + File.separator + unique_call_id + MediaRecording.file_exts[MediaRecording.currentFormat];
+                        if (Util.renameFile(context, rec.getPath(), fullPath)) {
+                            rec.setPath(fullPath);
+                        }
                     }
+                    rec.setStatus("NEW");
+                    dh.updateRecordingInbound(rec);
                     Intent intentService = new Intent(context, BackGroundService.class);
                     ContextCompat.startForegroundService(context, intentService);
                 }
