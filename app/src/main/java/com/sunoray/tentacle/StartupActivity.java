@@ -343,7 +343,7 @@ public class StartupActivity extends Activity {
         try {
             long size = Util.getAvailableInternalMemorySize();
             if (size < 250 * 1024 * 1024) {
-                showLowMemoryNotification("Low memory, Please clear it !");
+                showLowMemoryNotification("Low phone memory, please clear some space!");
             }
 
             double per1 = (Util.getAvailableInternalMemorySize() * 1.0 / Util.getTotalInternalMemorySize()) * 100.0;
@@ -382,9 +382,10 @@ public class StartupActivity extends Activity {
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setLights(Color.GREEN, 1000, 2000)
                     .setOngoing(false)
+                    .setContentTitle(getString(R.string.app_name))
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setAutoCancel(true)
-                    .setTicker("Low phone memory, please clear some space.")
+                    .setTicker("Low phone memory, please clear some space!")
                     .setContentText(filename)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(pendingIntent)
