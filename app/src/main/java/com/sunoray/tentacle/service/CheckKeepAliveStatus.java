@@ -6,15 +6,19 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.sunoray.tentacle.common.PreferenceUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CheckKeepAliveStatus extends JobService {
+    private static final Logger log = LoggerFactory.getLogger(CheckKeepAliveStatus.class);
+
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.d("notification-killer", "canceling notification");
+        log.debug("notification-killer", "canceling notification");
 
         // stopping notification service here
         if (PreferenceUtil.getSharedPreferences(getBaseContext(),
@@ -32,4 +36,5 @@ public class CheckKeepAliveStatus extends JobService {
     public boolean onStopJob(JobParameters params) {
         return false;
     }
+
 }
