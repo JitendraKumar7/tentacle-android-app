@@ -1,6 +1,7 @@
 package com.sunoray.tentacle.service;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,7 +231,7 @@ public class CallService extends Service {
                     @Override
                     public void onClick(View v) {
                         AudioManager mAudioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        if (mAudioMgr.isSpeakerphoneOn()) {
+                        if (Objects.requireNonNull(mAudioMgr).isSpeakerphoneOn()) {
                             mAudioMgr.setMode(AudioManager.MODE_IN_CALL);
                             mAudioMgr.setSpeakerphoneOn(false);
                             tDialerView.findViewById(R.id.dialer_ibtn_speaker).setBackgroundColor(Color.parseColor("#F5F5F5"));

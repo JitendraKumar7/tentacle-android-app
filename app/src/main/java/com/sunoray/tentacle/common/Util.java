@@ -429,7 +429,7 @@ public class Util {
             // we don't care if the device is charging or not
             builder.setRequiresCharging(false);
 
-            JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+            JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             Objects.requireNonNull(jobScheduler).schedule(builder.build());
         } catch (Exception e) {
             log.info("Exception in scheduleJob", e);
