@@ -320,11 +320,13 @@ public class StartupActivity extends Activity {
             }
 
             //setting notification Job scheduler checker
-            Util.scheduleJob(getApplicationContext(),
-                    CHECKER_JOB_ID,
-                    CheckKeepAliveStatus.class,
-                    10 * 60 * 1000,     // 10 min
-                    15 * 60 * 1000);    // 15 min
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Util.scheduleJob(getApplicationContext(),
+                        CHECKER_JOB_ID,
+                        CheckKeepAliveStatus.class,
+                        10 * 60 * 1000,     // 10 min
+                        15 * 60 * 1000);    // 15 min
+            }
 
             //checking device memory
             if (Integer.parseInt(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.RecordingOption, "0")) == 0)
