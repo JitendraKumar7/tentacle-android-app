@@ -473,7 +473,7 @@ public class StartupActivity extends Activity {
                     keyValuePairs.put("Manufacturer", android.os.Build.MANUFACTURER);
                     keyValuePairs.put("Model", android.os.Build.MODEL);
                     keyValuePairs.put("OSVersion", android.os.Build.VERSION.RELEASE);
-                    keyValuePairs.put("IMEI", Util.isNull(telephonyManager.getDeviceId()) ? "null" : telephonyManager.getDeviceId());
+                    keyValuePairs.put("IMEI", telephonyManager.getDeviceId());
                     keyValuePairs.put("appversion", String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
                     keyValuePairs.put("appversionname", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 
