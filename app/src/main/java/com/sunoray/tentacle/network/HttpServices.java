@@ -23,7 +23,6 @@ public class HttpServices {
 
     public Response post(String url, Map<String, String> formBody) throws IOException {
         log.info("Making request to: " + url);
-        log.info("Request param: " + formBody.toString());
         RequestBody body = formBodyBuilder(formBody).build();
         Request request = new Request.Builder()
                 .header("User-Agent", System.getProperty("http.agent"))
