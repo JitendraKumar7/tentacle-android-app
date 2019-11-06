@@ -22,13 +22,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 26
     // buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.sunoray.tentacle"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 26
         versionCode 44
         versionName "2.0.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -69,11 +69,11 @@ dependencies {
     //androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
     //    exclude group: 'com.android.support', module: 'support-annotations'
     //})
-    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'com.android.support:appcompat-v7:26.+'
     //testCompile 'junit:junit:4.12'
-    implementation 'com.android.support:design:28.+'
-    implementation 'com.android.support:support-v4:28.+'
-    implementation 'com.android.support:support-v13:28.+'
+    implementation 'com.android.support:design:26.+'
+    implementation 'com.android.support:support-v4:26.+'
+    implementation 'com.android.support:support-v13:26.+'
     implementation 'com.google.code.gson:gson:2.7'
 
     // log dependency
