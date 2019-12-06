@@ -302,7 +302,7 @@ public class GCMIntentService extends FirebaseMessagingService {
 
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             Notification notification = new NotificationCompat.Builder(getApplicationContext(),
-                    ApplicationExtension.BACK_CHANNEL_ID)
+                    ApplicationExtension.ALERT_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(title)
                     .setLights(Color.GREEN, 1000, 2000)
