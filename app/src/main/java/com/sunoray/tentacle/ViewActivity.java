@@ -457,10 +457,10 @@ public class ViewActivity extends Activity {
                     if (browserIntent.resolveActivity(getPackageManager()) != null)
                         startActivity(browserIntent);
                     else
-                        activityNotFoundAlert();
+                        Util.activityNotFoundAlert(ViewActivity.this);
                 } catch (ActivityNotFoundException e) {
                     log.info("Exception (startActivity): ", e);
-                    activityNotFoundAlert();
+                    Util.activityNotFoundAlert(ViewActivity.this);
                 } catch (Exception e) {
                     log.info("Exception (startActivity): ", e);
                 }
@@ -488,17 +488,6 @@ public class ViewActivity extends Activity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             view.loadUrl("file:///android_asset/error.html");
         }
-    }
-
-    private void activityNotFoundAlert() {
-        new AlertDialog.Builder(this, Util.getAlertTheame()).setTitle("Telephony Service Not Found")
-                .setMessage("The application configured in custom telephony service for making calls is not found. Make sure application is installed before making the call.")
-                .setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                }).create().show();
     }
 
     @Override

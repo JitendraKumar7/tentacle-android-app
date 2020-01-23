@@ -25,6 +25,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -434,5 +435,16 @@ public class Util {
         } catch (Exception e) {
             log.info("Exception in scheduleJob", e);
         }
+    }
+
+    public static void activityNotFoundAlert(Context context) {
+        new AlertDialog.Builder(context, getAlertTheame()).setTitle("Telephony Service Not Found")
+                .setMessage("The application configured in custom telephony service for making calls is not found. Make sure application is installed before making the call.")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                }).create().show();
     }
 }

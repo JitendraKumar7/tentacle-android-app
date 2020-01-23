@@ -16,12 +16,14 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -105,6 +107,9 @@ public class GCMIntentService extends FirebaseMessagingService {
             } else if (alertType.equalsIgnoreCase("hangup")) {
                 log.info("Hangup Call Request from GSM");
                 CallHelper.endCall(getBaseContext());
+            } else if (alertType.equalsIgnoreCase("custom_api")) {
+                log.info("Custom app invocation from Website (Hybrid calling)");
+                sendToKdialer(getBaseContext(), data);
             }
         } catch (Exception e) {
             log.debug("Error at onMessage: ", e);
@@ -454,5 +459,30 @@ public class GCMIntentService extends FirebaseMessagingService {
         if (!temp_id.equals(call_id))
             return false;
         return true;
+    }
+
+    private void sendToKdialer(Context context, Map<String, String> data) {
+        String custom_api_name = data.get("custom_api_name");
+        String phone_number = data.get("phone_number");
+        String unique_call_id = data.get("unique_call_id");
+        String sr_number = data.get("sr_number");
+        String api_key = data.get("api_key");
+
+        try {
+            String url = custom_api_name + "://" + phone_number
+                    + "/" + unique_call_id
+                    + "/" + sr_number
+                    + "/" + api_key;
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            if (browserIntent.resolveActivity(getPackageManager()) != null)
+                startActivity(browserIntent);
+            else
+                Util.activityNotFoundAlert(context);
+        } catch (ActivityNotFoundException e) {
+            log.info("Exception in sendToKdialer(): ", e);
+            Util.activityNotFoundAlert(context);
+        } catch (Exception e) {
+            log.info("Exception in sendToKdialer(): ", e);
+        }
     }
 }
