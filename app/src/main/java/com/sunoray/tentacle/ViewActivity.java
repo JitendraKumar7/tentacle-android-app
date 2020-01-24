@@ -457,14 +457,29 @@ public class ViewActivity extends Activity {
                     if (browserIntent.resolveActivity(getPackageManager()) != null)
                         startActivity(browserIntent);
                     else
-                        Util.activityNotFoundAlert(ViewActivity.this);
+                        activityNotFoundAlert(ViewActivity.this);
                 } catch (ActivityNotFoundException e) {
                     log.info("Exception (startActivity): ", e);
-                    Util.activityNotFoundAlert(ViewActivity.this);
+                    activityNotFoundAlert(ViewActivity.this);
                 } catch (Exception e) {
                     log.info("Exception (startActivity): ", e);
                 }
                 return true;
+            }
+        }
+
+        private void activityNotFoundAlert(Context context) {
+            try {
+                new AlertDialog.Builder(context, Util.getAlertTheame()).setTitle("Telephony Service Not Found")
+                        .setMessage("The application configured in custom telephony service for making calls is not found. Make sure application is installed before making the call.")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        }).create().show();
+            } catch (Exception e) {
+                log.info("Exception in activityNotFoundAlert", e);
             }
         }
 

@@ -16,14 +16,12 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
 import android.os.Environment;
@@ -107,9 +105,9 @@ public class GCMIntentService extends FirebaseMessagingService {
             } else if (alertType.equalsIgnoreCase("hangup")) {
                 log.info("Hangup Call Request from GSM");
                 CallHelper.endCall(getBaseContext());
-            } else if (alertType.equalsIgnoreCase("custom_api")) {
+            } else if (alertType.equalsIgnoreCase("kdialer")) {
                 log.info("Custom app invocation from Website (Hybrid calling)");
-                sendToKdialer(getBaseContext(), data);
+                sendToKdialer(getApplicationContext(), data);
             }
         } catch (Exception e) {
             log.debug("Error at onMessage: ", e);
@@ -462,27 +460,56 @@ public class GCMIntentService extends FirebaseMessagingService {
     }
 
     private void sendToKdialer(Context context, Map<String, String> data) {
-        String custom_api_name = data.get("custom_api_name");
-        String phone_number = data.get("phone_number");
+        String phone_number = Util.checkPhoneNumber(data.get("phone_number"));
         String unique_call_id = data.get("unique_call_id");
-        String sr_number = data.get("sr_number");
+        String sr_number = Util.checkPhoneNumber(data.get("sr_number"));
         String api_key = data.get("api_key");
+        String alertType = data.get("alert_type");
 
         try {
-            String url = custom_api_name + "://" + phone_number
-                    + "/" + unique_call_id
-                    + "/" + sr_number
-                    + "/" + api_key;
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            if (browserIntent.resolveActivity(getPackageManager()) != null)
-                startActivity(browserIntent);
-            else
-                Util.activityNotFoundAlert(context);
-        } catch (ActivityNotFoundException e) {
-            log.info("Exception in sendToKdialer(): ", e);
-            Util.activityNotFoundAlert(context);
+
+            ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+
+            if (taskInfo.get(0).topActivity.getPackageName().equalsIgnoreCase("com.sunoray.tentacle") && !AppProperties.activeAlertDialog) {
+                playNotification();
+
+                Intent gsmIntent = new Intent(getBaseContext(), com.sunoray.tentacle.extraActivity.GCMActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                gsmIntent.putExtra("action", alertType);
+                gsmIntent.putExtra("phone_number", phone_number);
+                gsmIntent.putExtra("unique_call_id", unique_call_id);
+                gsmIntent.putExtra("api_key", api_key);
+                gsmIntent.putExtra("sr_number", sr_number);
+                startActivity(gsmIntent);
+
+            } else {
+                Intent nextIntent = new Intent(getApplicationContext(), com.sunoray.tentacle.extraActivity.GCMActivity.class);
+                nextIntent.putExtra("action", alertType);
+                nextIntent.putExtra("phone_number", phone_number);
+                nextIntent.putExtra("unique_call_id", unique_call_id);
+                nextIntent.putExtra("api_key", api_key);
+                nextIntent.putExtra("sr_number", sr_number);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        getApplicationContext(),
+                        0,
+                        nextIntent,
+                        0);
+
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                        ApplicationExtension.ALERT_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Pending calls")
+                        .setLights(Color.GREEN, 1000, 2000)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setAutoCancel(true)
+                        .setContentText("call to:" + phone_number)
+                        .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                        .build();
+                mNotificationManager.notify(reqCall, notification);
+            }
         } catch (Exception e) {
-            log.info("Exception in sendToKdialer(): ", e);
+            log.debug("Exception in sendToKdialer()", e.toString());
         }
     }
 }
