@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;

@@ -23,11 +23,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.WakefulBroadcastReceiver;
-import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.legacy.content.WakefulBroadcastReceiver;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;

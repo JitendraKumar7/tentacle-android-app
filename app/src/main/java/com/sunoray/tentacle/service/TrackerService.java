@@ -18,7 +18,7 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.PreferenceUtil;

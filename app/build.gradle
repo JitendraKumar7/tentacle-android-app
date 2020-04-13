@@ -31,7 +31,7 @@ android {
         targetSdkVersion 28
         versionCode 49
         versionName "2.0.12.4"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //jackOptions.enabled = true
     }
 
@@ -69,10 +69,10 @@ dependencies {
     //androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
     //    exclude group: 'com.android.support', module: 'support-annotations'
     //})
-    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     //testCompile 'junit:junit:4.12'
-    implementation 'com.android.support:design:28.+'
-    implementation 'com.android.support:support-v4:28.+'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     //implementation 'com.android.support:support-v13:28.+'
     implementation 'com.google.code.gson:gson:2.7'
 
