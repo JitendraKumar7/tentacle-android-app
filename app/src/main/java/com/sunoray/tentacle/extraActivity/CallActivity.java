@@ -3,8 +3,6 @@ package com.sunoray.tentacle.extraActivity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sunoray.tentacle.R;
-import com.sunoray.tentacle.StartupActivity;
 import com.sunoray.tentacle.db.DatabaseHandler;
 import com.sunoray.tentacle.db.Recording;
 
@@ -20,7 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 import android.telecom.TelecomManager;
 import android.widget.Toast;
 

@@ -18,8 +18,8 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.Gravity;
@@ -30,7 +30,6 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.sunoray.tentacle.R;
-import com.sunoray.tentacle.StartupActivity;
 import com.sunoray.tentacle.ViewActivity;
 import com.sunoray.tentacle.application.ApplicationExtension;
 import com.sunoray.tentacle.common.AppProperties;
@@ -50,7 +49,6 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 import static android.view.WindowManager.LayoutParams.TYPE_PHONE;
-import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
 
 public class CallService extends Service {
 
