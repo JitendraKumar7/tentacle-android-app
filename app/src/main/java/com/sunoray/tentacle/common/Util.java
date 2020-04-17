@@ -1,6 +1,8 @@
 package com.sunoray.tentacle.common;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -34,6 +36,8 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.telecom.TelecomManager;
+import android.telephony.TelephonyManager;
 
 public class Util {
 
@@ -434,6 +438,22 @@ public class Util {
             Objects.requireNonNull(jobScheduler).schedule(builder.build());
         } catch (Exception e) {
             log.info("Exception in scheduleJob", e);
+        }
+    }
+
+    public static void endCall(Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+            if (telecomManager != null) {
+                telecomManager.endCall();
+            }
+        } else {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            Method m1 = Objects.requireNonNull(tm).getClass().getDeclaredMethod("getITelephony");
+            m1.setAccessible(true);
+            Object iTelephony = m1.invoke(tm);
+            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
+            m3.invoke(iTelephony);
         }
     }
 }
