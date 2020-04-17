@@ -75,7 +75,8 @@ public class SplashScreen extends AppCompatActivity {
                         Manifest.permission.READ_CONTACTS,
                         Manifest.permission.GET_ACCOUNTS,
                         Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ANSWER_PHONE_CALLS
                 )
                 .subscribe(new Action1<Boolean>() {
                     @Override

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.ANSWER_PHONE_CALLS;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.GET_ACCOUNTS;
@@ -37,6 +38,7 @@ public class PermissionRequest {
     public static final int REQUEST_MICROPHONE = 3;
     public static final int REQUEST_PHONE = 4;
     public static final int REQUEST_STORAGE = 5;
+    public static final int REQUEST_ANSWER_CALL = 6;
 
     private static String[] PERMISSIONS_CONTACT = {READ_CONTACTS,
             WRITE_CONTACTS,
@@ -47,13 +49,14 @@ public class PermissionRequest {
 
     private static String[] PERMISSIONS_PHONE = {READ_CALL_LOG,
             CALL_PHONE,
-            READ_PHONE_STATE};
+            READ_PHONE_STATE,
+            ANSWER_PHONE_CALLS};
 
     private static String[] PERMISSIONS_STORAGE = {READ_EXTERNAL_STORAGE,
             WRITE_EXTERNAL_STORAGE};
 
     private static String[] permissionList = new String[]{CALL_PHONE, READ_CALL_LOG,
-            READ_PHONE_STATE, RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION,
+            READ_PHONE_STATE, ANSWER_PHONE_CALLS, RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION,
             GET_ACCOUNTS, READ_CONTACTS, CAMERA};
 
     // ask particular (single) permission and also track it on activity
@@ -155,7 +158,8 @@ public class PermissionRequest {
         }
         if (ActivityCompat.checkSelfPermission(context, READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, CALL_PHONE) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                && ActivityCompat.checkSelfPermission(context, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) {
             return requestPhonePermission(context);
         } else {
             return true;
@@ -165,7 +169,8 @@ public class PermissionRequest {
     private static boolean requestPhonePermission(Activity context) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(context, READ_CALL_LOG)
                 && ActivityCompat.shouldShowRequestPermissionRationale(context, CALL_PHONE)
-                && ActivityCompat.shouldShowRequestPermissionRationale(context, READ_PHONE_STATE)) {
+                && ActivityCompat.shouldShowRequestPermissionRationale(context, READ_PHONE_STATE)
+                && ActivityCompat.shouldShowRequestPermissionRationale(context, ANSWER_PHONE_CALLS)) {
             ActivityCompat.requestPermissions(context,
                     PERMISSIONS_PHONE,
                     REQUEST_PHONE);

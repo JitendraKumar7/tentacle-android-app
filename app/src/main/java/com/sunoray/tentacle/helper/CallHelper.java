@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sunoray.tentacle.common.AppProperties;
+import com.sunoray.tentacle.common.Util;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -47,12 +48,7 @@ public class CallHelper {
 	public static void endCall(Context context) {
 		try {
 			if(isCallInProgress(context)) {
-				TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-				Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-				m1.setAccessible(true);
-				Object iTelephony = m1.invoke(tm);
-				Method m2 = iTelephony.getClass().getDeclaredMethod("endCall");
-				m2.invoke(iTelephony);
+				Util.endCall(context);
 				log.info("Call Disconnected");	
 			}
 		} catch (Exception e) {

@@ -129,13 +129,8 @@ public class TentacleJSInterface {
 
     @JavascriptInterface
     public void disconnectCall() {
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
-            Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-            m1.setAccessible(true);
-            Object iTelephony = m1.invoke(tm);
-            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
-            m3.invoke(iTelephony);
+            Util.endCall(context);
         } catch (Exception e) {
             log.info("Exception @ End call", e);
         }

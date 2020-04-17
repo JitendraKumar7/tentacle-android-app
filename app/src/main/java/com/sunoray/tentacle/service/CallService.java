@@ -250,12 +250,7 @@ public class CallService extends Service {
                         ((TextView) tDialerView.findViewById(R.id.dialer_txt_status)).setText("Call Ending..");
                         try {
                             log.info("Call disconnect using TDialler");
-                            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-                            Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-                            m1.setAccessible(true);
-                            Object iTelephony = m1.invoke(tm);
-                            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
-                            m3.invoke(iTelephony);
+                            Util.endCall(context);
                             Thread.sleep(1000);
                             closeTDialer();
                         } catch (Exception e) {
@@ -268,7 +263,7 @@ public class CallService extends Service {
         );
 
         wmParams.gravity = Gravity.TOP;
-        // add Dialer UI To ViewActivity  
+        // add Dialer UI To ViewActivity
         wm.addView(tDialerView, wmParams);
         log.debug("tDialer Started");
     }

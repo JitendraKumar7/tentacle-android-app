@@ -45,6 +45,9 @@
     <!--Foreground Service permission-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <!--Used at Disconnect call when Hide Number Enabled-->
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+
     <application
         android:name=".application.ApplicationExtension"
         android:allowBackup="true"
