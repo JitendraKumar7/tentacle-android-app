@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.sunoray.tentacle.helper.StorageHandler;
 import com.sunoray.tentacle.network.NetworkUtil;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -29,6 +30,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -38,6 +40,8 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.telecom.TelecomManager;
 import android.telephony.TelephonyManager;
+
+import androidx.core.content.ContextCompat;
 
 public class Util {
 
@@ -444,9 +448,8 @@ public class Util {
     public static void endCall(Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
-            if (telecomManager != null) {
+            if (telecomManager != null && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED)
                 telecomManager.endCall();
-            }
         } else {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             Method m1 = Objects.requireNonNull(tm).getClass().getDeclaredMethod("getITelephony");
