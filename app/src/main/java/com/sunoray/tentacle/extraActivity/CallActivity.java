@@ -27,8 +27,6 @@ import com.sunoray.tentacle.common.CommonField;
 import com.sunoray.tentacle.common.Util;
 import com.sunoray.tentacle.helper.PermissionRequest;
 
-import static android.Manifest.permission.ANSWER_PHONE_CALLS;
-
 public class CallActivity extends Activity {
 
     static private final Logger log = LoggerFactory.getLogger(CallActivity.class);
@@ -133,8 +131,7 @@ public class CallActivity extends Activity {
     public void checkOverlayPermission(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 && !Settings.canDrawOverlays(activity)
-                && Util.makeNumberHiding(rec.getHideNumber())
-                && ActivityCompat.checkSelfPermission(this, ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
+                && Util.makeNumberHiding(rec.getHideNumber())) {
             new AlertDialog.Builder(this, alertTheme).setTitle("Screen overlay detected")
                     .setMessage("To make a call you first have to turn on the screen overlay from settings.")
                     .setCancelable(false)
@@ -145,8 +142,6 @@ public class CallActivity extends Activity {
                             startActivityForResult(intent, REQUEST_CODE);
                         }
                     }).create().show();
-        } else if (ActivityCompat.checkSelfPermission(this, ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) {
-            PermissionRequest.checkPhonePermissions(CallActivity.this);
         } else {
             callNumber();
         }
@@ -180,9 +175,6 @@ public class CallActivity extends Activity {
                 log.debug("closing activity");
                 finish();
             }
-        }
-        if (requestCode == PermissionRequest.REQUEST_ANSWER_CALL) {
-            checkOverlayPermission(CallActivity.this);
         }
     }
 

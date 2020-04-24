@@ -49,8 +49,7 @@ public class PermissionRequest {
 
     private static String[] PERMISSIONS_PHONE = {READ_CALL_LOG,
             CALL_PHONE,
-            READ_PHONE_STATE,
-            ANSWER_PHONE_CALLS};
+            READ_PHONE_STATE};
 
     private static String[] PERMISSIONS_STORAGE = {READ_EXTERNAL_STORAGE,
             WRITE_EXTERNAL_STORAGE};
@@ -158,8 +157,7 @@ public class PermissionRequest {
         }
         if (ActivityCompat.checkSelfPermission(context, READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, CALL_PHONE) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, ANSWER_PHONE_CALLS) != PackageManager.PERMISSION_GRANTED) {
+                && ActivityCompat.checkSelfPermission(context, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             return requestPhonePermission(context);
         } else {
             return true;
@@ -169,8 +167,7 @@ public class PermissionRequest {
     private static boolean requestPhonePermission(Activity context) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(context, READ_CALL_LOG)
                 && ActivityCompat.shouldShowRequestPermissionRationale(context, CALL_PHONE)
-                && ActivityCompat.shouldShowRequestPermissionRationale(context, READ_PHONE_STATE)
-                && ActivityCompat.shouldShowRequestPermissionRationale(context, ANSWER_PHONE_CALLS)) {
+                && ActivityCompat.shouldShowRequestPermissionRationale(context, READ_PHONE_STATE)) {
             ActivityCompat.requestPermissions(context,
                     PERMISSIONS_PHONE,
                     REQUEST_PHONE);
