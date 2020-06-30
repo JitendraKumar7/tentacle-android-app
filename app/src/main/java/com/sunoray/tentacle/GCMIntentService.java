@@ -108,6 +108,9 @@ public class GCMIntentService extends FirebaseMessagingService {
             } else if (alertType.equalsIgnoreCase("kdialer")) {
                 log.info("Custom app invocation from Website (Hybrid calling)");
                 sendToKdialer(getApplicationContext(), data);
+            } else if (alertType.equalsIgnoreCase("follow_ups")) {
+                log.info("Receiving follow-up notifications");
+                sendFollowUps(getBaseContext(), data);
             }
         } catch (Exception e) {
             log.debug("Error at onMessage: ", e);
@@ -504,6 +507,57 @@ public class GCMIntentService extends FirebaseMessagingService {
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setAutoCancel(true)
                         .setContentText("call to:" + phone_number)
+                        .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                        .build();
+                mNotificationManager.notify(reqCall, notification);
+            }
+        } catch (Exception e) {
+            log.debug("Exception in sendToKdialer()", e.toString());
+        }
+    }
+
+    private void sendFollowUps(Context context, Map<String, String> data) {
+        String alertType = data.get("alert_type");
+        String title = data.get("title");
+        String content = data.get("content");
+        String time = data.get("time");
+
+        try {
+
+            ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+
+            if (taskInfo.get(0).topActivity.getPackageName().equalsIgnoreCase("com.sunoray.tentacle") && !AppProperties.activeAlertDialog) {
+                playNotification();
+
+                Intent gsmIntent = new Intent(getBaseContext(), com.sunoray.tentacle.extraActivity.GCMActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                gsmIntent.putExtra("action", "/" + alertType);
+                gsmIntent.putExtra("title", title);
+                gsmIntent.putExtra("content", content);
+                gsmIntent.putExtra("time", time);
+                startActivity(gsmIntent);
+
+            } else {
+                Intent nextIntent = new Intent(getApplicationContext(), com.sunoray.tentacle.extraActivity.GCMActivity.class);
+                nextIntent.putExtra("action", "/" + alertType);
+                nextIntent.putExtra("title", title);
+                nextIntent.putExtra("content", content);
+                nextIntent.putExtra("time", time);
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        getApplicationContext(),
+                        0,
+                        nextIntent,
+                        0);
+
+                NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                        ApplicationExtension.ALERT_CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
+                        .setLights(Color.GREEN, 1000, 2000)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setAutoCancel(true)
+                        .setContentText(content)
                         .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                         .build();
                 mNotificationManager.notify(reqCall, notification);
