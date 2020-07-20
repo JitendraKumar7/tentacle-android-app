@@ -117,6 +117,7 @@ public class CallService extends Service {
                             media = new MediaRecording(context, rec.getCallId());
                             if (recordingOption.equals("0")) {
                                 media.startRecording(rec.getAudioSrc());
+                                rec.setStartTime(System.currentTimeMillis());
                             }
                             isPhoneCalling = true;
                         }
@@ -140,6 +141,7 @@ public class CallService extends Service {
                             AppProperties.isCallServiceRunning = false;
                             if (recordingOption.equals("0")) {
                                 media.stopRecording();
+                                rec.setStopTime(System.currentTimeMillis());
                             }
                             telephonyManager.listen(phoneListener, PhoneStateListener.LISTEN_NONE);
                             isPhoneCalling = false;
@@ -288,6 +290,7 @@ public class CallService extends Service {
         ContextCompat.startForegroundService(getBaseContext(), intentService);
         if (media != null && media.recState.equalsIgnoreCase("ON")) {
             media.stopRecording();
+            rec.setStopTime(System.currentTimeMillis());
         }
         super.onDestroy();
     }
