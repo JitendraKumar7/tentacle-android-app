@@ -6,7 +6,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 
 import com.sunoray.tentacle.R;
@@ -23,7 +23,7 @@ public class KeepAliveService extends Service {
   @Override
   public void onCreate() {
     //starting ongoing notification for creating foreground services
-    startForeground(4, buildForegroundNotification("Listening calls"));
+    startForeground(4, buildForegroundNotification("Monitoring calls"));
     log.debug("NotificationService started");
   }
 
@@ -62,7 +62,7 @@ public class KeepAliveService extends Service {
             .setContentText(filename)
             .setContentIntent(pendingIntent)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setTicker("Listening calls")
+            .setTicker("Monitoring calls")
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .build();
 

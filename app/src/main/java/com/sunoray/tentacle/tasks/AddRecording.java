@@ -11,8 +11,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.CallLog;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import androidx.core.content.ContextCompat;
 
 import com.sunoray.tentacle.common.Util;
 import com.sunoray.tentacle.db.DatabaseHandler;

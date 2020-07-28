@@ -12,7 +12,7 @@
 			<FileNamePattern>/sdcard/Tentacle/log/TentacleLog.log.%i</FileNamePattern>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>200KB</MaxFileSize>
+			<MaxFileSize>1024KB</MaxFileSize>
 		</triggeringPolicy>
 	</appender>
 		
