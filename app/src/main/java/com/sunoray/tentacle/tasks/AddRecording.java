@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.CallLog;
+import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import com.sunoray.tentacle.common.Util;
@@ -63,22 +64,26 @@ public class AddRecording extends AsyncTask<Recording, Void, String> {
             } else {
                 rec.setDialTime(0);
             }
-
             int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission_group.CONTACTS);
             // Setting Call Duration to rec
-            HashMap<String, String> phoneCallLogDetails = getLastOutCall(rec.getPhoneNumber());
-            if (phoneCallLogDetails != null) {
-                log.debug("ID: "+rec.getCallId() + " | Number " + phoneCallLogDetails.get(CallLog.Calls.NUMBER) + " | Type " + phoneCallLogDetails.get(CallLog.Calls.TYPE) + " | Duration " + phoneCallLogDetails.get(CallLog.Calls.DURATION));
-                if (phoneCallLogDetails.get(CallLog.Calls.DURATION) == null || phoneCallLogDetails.get(CallLog.Calls.DURATION).equals(""))
-                    rec.setDuration(0);
-                else
-                    rec.setDuration(Integer.parseInt(phoneCallLogDetails.get(CallLog.Calls.DURATION)));
+            Log.d("Timer-test",rec.getStopTime() +"-"+ rec.getStartTime()+"="+(rec.getStopTime() - rec.getStartTime()));
+            if(rec.getStopTime() - rec.getStartTime() <= 0) {
+                HashMap<String, String> phoneCallLogDetails = getLastOutCall(rec.getPhoneNumber());
+                if (phoneCallLogDetails != null) {
+                    log.debug("ID: "+rec.getCallId() + " | Number " + phoneCallLogDetails.get(CallLog.Calls.NUMBER) + " | Type " + phoneCallLogDetails.get(CallLog.Calls.TYPE) + " | Duration " + phoneCallLogDetails.get(CallLog.Calls.DURATION));
+                    if (phoneCallLogDetails.get(CallLog.Calls.DURATION) == null || phoneCallLogDetails.get(CallLog.Calls.DURATION).equals(""))
+                        rec.setDuration(0);
+                    else
+                        rec.setDuration(Integer.parseInt(phoneCallLogDetails.get(CallLog.Calls.DURATION)));
 
-                // For Hide Number - Removing Number for Phone Log If Its there
-                if (Util.makeNumberHiding(rec.getHideNumber()))
-                    removeCallBaseOnId(phoneCallLogDetails.get(CallLog.Calls._ID));
+                    // For Hide Number - Removing Number for Phone Log If Its there
+                    if (Util.makeNumberHiding(rec.getHideNumber()))
+                        removeCallBaseOnId(phoneCallLogDetails.get(CallLog.Calls._ID));
+                } else {
+                    rec.setDuration(0);
+                }
             } else {
-                rec.setDuration(0);
+                rec.setDuration((int)(rec.getStopTime() - rec.getStartTime())/1000);
             }
 
             if (rec.getDirection() != null && rec.getDirection().equalsIgnoreCase("Inbound")) {
