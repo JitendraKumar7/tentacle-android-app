@@ -21,8 +21,8 @@ public class BulkUploadLoop extends AsyncTask<Void, Void, Boolean> {
 	
 	private Context context = null;
 	private static final Logger log =  LoggerFactory.getLogger(BulkUploadLoop.class);
-	private Boolean backgroundStatus = true; 
-	
+	private Boolean backgroundStatus = true;
+
 	public BulkUploadLoop(Context context) {
 		this.context = context;
 	}
@@ -35,7 +35,7 @@ public class BulkUploadLoop extends AsyncTask<Void, Void, Boolean> {
 
     @SuppressLint("NewApi")
 	public boolean upload() {
-    	backgroundStatus = true;   
+    	backgroundStatus = true;
 		try {
 			while(backgroundStatus) {
 				// checking network status
@@ -47,7 +47,7 @@ public class BulkUploadLoop extends AsyncTask<Void, Void, Boolean> {
 					log.info("Number of entries to push =" + listRecordings.size());
 					if (listRecordings.size() > 0) {
 						for (Recording recording : listRecordings) {
-							if (!(recording.getPath() == null || recording.equals(""))) {
+							if (!recording.equals("")) {
 								if (recording.getStatus().equals("PENDING") || recording.getDataSent() == 1) {
 									//sendStatus = sf.sendCallRecording(recording, context);
 									log.info("call recording sending");

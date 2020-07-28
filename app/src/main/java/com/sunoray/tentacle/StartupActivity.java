@@ -10,28 +10,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -44,6 +46,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sunoray.tentacle.application.ApplicationExtension;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.PreferenceUtil;
 import com.sunoray.tentacle.common.Util;
@@ -72,6 +75,7 @@ public class StartupActivity extends Activity {
     Button retry;
     MenuItem optMenuAudioSettings;
     public static final int CHECKER_JOB_ID = 12;
+    public static final int MEMORY_JOB_ID = 13;
 
     BroadcastReceiver incomingCallReceiver = new CallBarring();
 
@@ -131,20 +135,6 @@ public class StartupActivity extends Activity {
         registerReceiver(incomingCallReceiver, filter);
 
 
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setCheckerJob() {
-        try {
-            JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            jobScheduler.schedule(new JobInfo.Builder(CHECKER_JOB_ID,
-                    new ComponentName(this, CheckKeepAliveStatus.class))
-                    .setRequiresDeviceIdle(true)    // device should be idle
-                    .setPeriodic(10 * 60 * 1000)     // 10 min
-                    .build());
-        } catch (Exception e) {
-            log.debug("Exception in setCheckerJob", e);
-        }
     }
 
     @Override
@@ -297,7 +287,7 @@ public class StartupActivity extends Activity {
             }*/
             // check GCM registration
             else if (!PreferenceUtil.getSharedPreferences(this, PreferenceUtil.REGID, "").isEmpty()
-                    && PreferenceUtil.getSharedPreferences(this,PreferenceUtil.FCM_IS_UPDATED,"false").equalsIgnoreCase("true")) {
+                    && PreferenceUtil.getSharedPreferences(this, PreferenceUtil.FCM_IS_UPDATED, "false").equalsIgnoreCase("true")) {
                 alert.setText("Registering Device...");
                 sendRegistrationToServer();
                 return false;
@@ -330,8 +320,17 @@ public class StartupActivity extends Activity {
             }
 
             //setting notification Job scheduler checker
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                setCheckerJob();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Util.scheduleJob(getApplicationContext(),
+                        CHECKER_JOB_ID,
+                        CheckKeepAliveStatus.class,
+                        10 * 60 * 1000,     // 10 min
+                        15 * 60 * 1000);    // 15 min
+            }
+
+            //checking device memory
+            if (Integer.parseInt(PreferenceUtil.getSharedPreferences(getBaseContext(), PreferenceUtil.RecordingOption, "0")) == 0)
+                notifyLowMemory();
 
             alert.setVisibility(View.GONE);
             retry.setVisibility(View.GONE);
@@ -339,6 +338,63 @@ public class StartupActivity extends Activity {
             return true;
         } finally {
 
+        }
+    }
+
+    private void notifyLowMemory() {
+        try {
+            long size = Util.getAvailableInternalMemorySize();
+            if (size < 250 * 1024 * 1024) {
+                showLowMemoryNotification("Low phone memory, please clear some space!");
+            }
+
+            double per1 = (Util.getAvailableInternalMemorySize() * 1.0 / Util.getTotalInternalMemorySize()) * 100.0;
+            log.debug("showAvailableSpace", "\n\n ------ Available Internal Memory : "
+                    + Util.formatSize(Util.getAvailableInternalMemorySize())
+                    + "/" + Util.formatSize(Util.getTotalInternalMemorySize())
+                    + " (" + (float) per1 + " %) "
+                    + "------ \n\n");
+
+            double per2 = (Util.getAvailableExternalMemorySize() * 1.0 / Util.getTotalExternalMemorySize()) * 100.0;
+            log.debug("showAvailableSpace", "\n\n ------ Available External Memory : "
+                    + Util.formatSize(Util.getAvailableExternalMemorySize())
+                    + "/" + Util.formatSize(Util.getTotalExternalMemorySize())
+                    + " (" + (float) per2 + " %) "
+                    + "------ \n\n");
+
+            double per3 = (Util.getAvilableRamSize(getApplicationContext()) * 1.0 / Util.getTotalRamSize(getApplicationContext())) * 100.0;
+            log.debug("showAvailableSpace", "\n\n ------ Available RAM : "
+                    + Util.formatSize(Util.getAvilableRamSize(getApplicationContext()))
+                    + "/" + Util.formatSize(Util.getTotalRamSize(getApplicationContext()))
+                    + " (" + (float) per3 + " %) "
+                    + "------ \n\n");
+        } catch (Exception e) {
+            log.debug("Exception in notifyLowMemory()");
+        }
+    }
+
+    private void showLowMemoryNotification(String filename) {
+        try {
+            Intent notificationIntent = new Intent(getApplicationContext(), StartupActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            Notification notification = new NotificationCompat.Builder(getApplicationContext(),
+                    ApplicationExtension.ALERT_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setLights(Color.GREEN, 1000, 2000)
+                    .setOngoing(false)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                    .setAutoCancel(true)
+                    .setTicker("Low phone memory, please clear some space!")
+                    .setContentText(filename)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(pendingIntent)
+                    .build();
+            mNotificationManager.notify(7, notification);
+        } catch (Exception e) {
+            log.info("Exce in buildForegroundNotification()", e);
         }
     }
 
@@ -401,7 +457,7 @@ public class StartupActivity extends Activity {
                     PreferenceUtil.setSharedPreferences(this, PreferenceUtil.AudioSource, "1");
             }
             // IF PIN is not stored on device
-            if (PreferenceUtil.getSharedPreferences(this,PreferenceUtil.FCM_IS_UPDATED,"false").equalsIgnoreCase("true")) {
+            if (PreferenceUtil.getSharedPreferences(this, PreferenceUtil.FCM_IS_UPDATED, "false").equalsIgnoreCase("true")) {
                 if (android.os.Build.VERSION.SDK_INT > 9) {
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                     StrictMode.setThreadPolicy(policy);
@@ -419,7 +475,7 @@ public class StartupActivity extends Activity {
                     keyValuePairs.put("Manufacturer", android.os.Build.MANUFACTURER);
                     keyValuePairs.put("Model", android.os.Build.MODEL);
                     keyValuePairs.put("OSVersion", android.os.Build.VERSION.RELEASE);
-                    keyValuePairs.put("IMEI", telephonyManager.getDeviceId());
+                    keyValuePairs.put("IMEI", Util.isNull(telephonyManager.getDeviceId()) ? "null" : telephonyManager.getDeviceId());
                     keyValuePairs.put("appversion", String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
                     keyValuePairs.put("appversionname", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
 

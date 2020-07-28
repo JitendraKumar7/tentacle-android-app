@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.net.Uri;
 import android.os.Bundle;
 import com.sunoray.tentacle.ViewActivity;
 import com.sunoray.tentacle.common.AppProperties;
@@ -86,48 +88,75 @@ public class GCMActivity extends Activity {
                     alertDialog.show();
                     AppProperties.activeAlertDialog = true;
                 } else {
-                    log.info("alert action:" + action);
-                    String alertTitle = Util.isNull(extras.getString("title")) ? null : extras.getString("title");
-                    String alertContent = Util.isNull(extras.getString("content")) ? null : extras.getString("content");
-                    if (alertTitle != null && alertContent != null) {
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, alertTheme);
-                        // set title
-                        alertDialogBuilder.setTitle(alertTitle);
-                        // set dialog message
-                        alertDialogBuilder
-                                .setMessage(alertContent)
-                                .setCancelable(false)
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        log.info("Alert declined");
-                                        AppProperties.activeAlertDialog = false;
-                                        dialog.cancel();
-                                        // Closing this activity
-                                        finish();
-                                    }
-                                })
-                                .setPositiveButton("Open", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        log.info("Alert Opened");
-                                        AppProperties.activeAlertDialog = false;
-                                        dialog.cancel();
+                    if (action.equalsIgnoreCase("kdialer")) {
+                        log.info("Custom app invocation from Website (Hybrid calling)");
 
-                                        // Calling View Activity with URL
-                                        Intent webViweIntent = new Intent(getApplicationContext(), ViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        webViweIntent.putExtra("goTo", "URL");
-                                        webViweIntent.putExtra("action", action);
-                                        startActivity(webViweIntent);
+                        String phone_number = extras.getString("phone_number");
+                        String unique_call_id = extras.getString("unique_call_id");
+                        String sr_number = extras.getString("sr_number");
+                        String api_key = extras.getString("api_key");
 
-                                        // Closing this activity
-                                        finish();
-                                    }
-                                });
-                        // create alert dialog
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
-                        AppProperties.activeAlertDialog = true;
+                        String url = action + "://" + phone_number
+                                + "/" + unique_call_id
+                                + "/" + sr_number
+                                + "/" + api_key;
+                        try {
+
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            if (browserIntent.resolveActivity(getPackageManager()) != null)
+                                startActivity(browserIntent);
+                            else
+                                activityNotFoundAlert(this, alertTheme);
+                        } catch (ActivityNotFoundException e) {
+                            log.info("Exception in sendToKdialer(): ", e);
+                            activityNotFoundAlert(this, alertTheme);
+                        } catch (Exception e) {
+                            log.info("Exception in sendToKdialer(): ", e);
+                        }
                     } else {
-                        log.debug("title and content can't be null");
+                        log.info("alert action:" + action);
+                        String alertTitle = Util.isNull(extras.getString("title")) ? null : extras.getString("title");
+                        String alertContent = Util.isNull(extras.getString("content")) ? null : extras.getString("content");
+                        if (alertTitle != null && alertContent != null) {
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, alertTheme);
+                            // set title
+                            alertDialogBuilder.setTitle(alertTitle);
+                            // set dialog message
+                            alertDialogBuilder
+                                    .setMessage(alertContent)
+                                    .setCancelable(false)
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            log.info("Alert declined");
+                                            AppProperties.activeAlertDialog = false;
+                                            dialog.cancel();
+                                            // Closing this activity
+                                            finish();
+                                        }
+                                    })
+                                    .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            log.info("Alert Opened");
+                                            AppProperties.activeAlertDialog = false;
+                                            dialog.cancel();
+
+                                            // Calling View Activity with URL
+                                            Intent webViweIntent = new Intent(getApplicationContext(), ViewActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            webViweIntent.putExtra("goTo", "URL");
+                                            webViweIntent.putExtra("action", action);
+                                            startActivity(webViweIntent);
+
+                                            // Closing this activity
+                                            finish();
+                                        }
+                                    });
+                            // create alert dialog
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                            AppProperties.activeAlertDialog = true;
+                        } else {
+                            log.debug("title and content can't be null");
+                        }
                     }
                 }
             } else {
@@ -136,6 +165,21 @@ public class GCMActivity extends Activity {
         } catch (Exception e) {
             log.debug("Some Error in alert display: " + e);
             AppProperties.activeAlertDialog = false;
+        }
+    }
+
+    public static void activityNotFoundAlert(Context context, int alertTheme) {
+        try {
+            new AlertDialog.Builder(context, alertTheme).setTitle("Telephony Service Not Found")
+                    .setMessage("The application configured in custom telephony service for making calls is not found. Make sure application is installed before making the call.")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    }).create().show();
+        } catch (Exception e) {
+            log.info("Exception in activityNotFoundAlert", e);
         }
     }
 

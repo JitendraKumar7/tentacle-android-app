@@ -122,9 +122,16 @@ public class SendLogFile extends AsyncTask<String, Void, Boolean> {
         List<String> appList = new ArrayList<String>();
         try {
             final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-            final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
-            for (int i = 0; i < services.size(); i++) {
-                appList.add(services.get(i).service.getPackageName());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                final List<ActivityManager.RunningAppProcessInfo> services = activityManager.getRunningAppProcesses();
+                for (int i = 0; i < services.size(); i++) {
+                    appList.add(services.get(i).processName);
+                }
+            } else {
+                final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+                for (int i = 0; i < services.size(); i++) {
+                    appList.add(services.get(i).service.getPackageName());
+                }
             }
         } catch (Exception e) {
             log.debug("Exception: " + e);

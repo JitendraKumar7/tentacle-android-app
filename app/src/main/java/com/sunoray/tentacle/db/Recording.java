@@ -15,6 +15,8 @@ public class Recording implements Serializable {
     private int numberOfTries;
     private String status;
     private int duration;
+    private long startTime;
+    private long stopTime;
     private String direction = "Outbound";
     private String audioSrc;
     private String pin;
@@ -42,6 +44,8 @@ public class Recording implements Serializable {
     }
 
     public String getPath() {
+        if (path == null)
+            return "";
         return path;
     }
 
@@ -175,5 +179,19 @@ public class Recording implements Serializable {
 
     public void setDialTime(long dialTime) {
         this.dialTime = dialTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStopTime(long stopTime) {
+        this.stopTime = stopTime;
+    }
+    public long getStopTime() {
+        return stopTime;
     }
 }

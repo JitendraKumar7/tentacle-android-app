@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v13.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.ANSWER_PHONE_CALLS;
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.GET_ACCOUNTS;
@@ -37,6 +38,7 @@ public class PermissionRequest {
     public static final int REQUEST_MICROPHONE = 3;
     public static final int REQUEST_PHONE = 4;
     public static final int REQUEST_STORAGE = 5;
+    public static final int REQUEST_ANSWER_CALL = 6;
 
     private static String[] PERMISSIONS_CONTACT = {READ_CONTACTS,
             WRITE_CONTACTS,
@@ -53,7 +55,7 @@ public class PermissionRequest {
             WRITE_EXTERNAL_STORAGE};
 
     private static String[] permissionList = new String[]{CALL_PHONE, READ_CALL_LOG,
-            READ_PHONE_STATE, RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION,
+            READ_PHONE_STATE, ANSWER_PHONE_CALLS, RECORD_AUDIO, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION,
             GET_ACCOUNTS, READ_CONTACTS, CAMERA};
 
     // ask particular (single) permission and also track it on activity

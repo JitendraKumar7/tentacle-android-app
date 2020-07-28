@@ -1,12 +1,15 @@
 package com.sunoray.tentacle.service;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +18,8 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.view.Gravity;
@@ -26,6 +30,8 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.sunoray.tentacle.R;
+import com.sunoray.tentacle.ViewActivity;
+import com.sunoray.tentacle.application.ApplicationExtension;
 import com.sunoray.tentacle.common.AppProperties;
 import com.sunoray.tentacle.common.CommonField;
 import com.sunoray.tentacle.common.PreferenceUtil;
@@ -43,7 +49,6 @@ import static android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 import static android.view.WindowManager.LayoutParams.TYPE_PHONE;
-import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
 
 public class CallService extends Service {
 
@@ -59,7 +64,8 @@ public class CallService extends Service {
 
     @Override
     public void onCreate() {
-        log.info("Service Created");
+        startForeground(5, buildForegroundNotification("On-going Call"));
+        log.info("CallService Created");
         super.onCreate();
     }
 
@@ -117,6 +123,7 @@ public class CallService extends Service {
                             media = new MediaRecording(context, rec.getCallId());
                             if (recordingOption.equals("0")) {
                                 media.startRecording(rec.getAudioSrc());
+                                rec.setStartTime(System.currentTimeMillis());
                             }
                             isPhoneCalling = true;
                         }
@@ -140,6 +147,7 @@ public class CallService extends Service {
                             AppProperties.isCallServiceRunning = false;
                             if (recordingOption.equals("0")) {
                                 media.stopRecording();
+                                rec.setStopTime(System.currentTimeMillis());
                             }
                             telephonyManager.listen(phoneListener, PhoneStateListener.LISTEN_NONE);
                             isPhoneCalling = false;
@@ -223,7 +231,7 @@ public class CallService extends Service {
                     @Override
                     public void onClick(View v) {
                         AudioManager mAudioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        if (mAudioMgr.isSpeakerphoneOn()) {
+                        if (Objects.requireNonNull(mAudioMgr).isSpeakerphoneOn()) {
                             mAudioMgr.setMode(AudioManager.MODE_IN_CALL);
                             mAudioMgr.setSpeakerphoneOn(false);
                             tDialerView.findViewById(R.id.dialer_ibtn_speaker).setBackgroundColor(Color.parseColor("#F5F5F5"));
@@ -244,12 +252,7 @@ public class CallService extends Service {
                         ((TextView) tDialerView.findViewById(R.id.dialer_txt_status)).setText("Call Ending..");
                         try {
                             log.info("Call disconnect using TDialler");
-                            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-                            Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-                            m1.setAccessible(true);
-                            Object iTelephony = m1.invoke(tm);
-                            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
-                            m3.invoke(iTelephony);
+                            Util.endCall(context);
                             Thread.sleep(1000);
                             closeTDialer();
                         } catch (Exception e) {
@@ -262,7 +265,7 @@ public class CallService extends Service {
         );
 
         wmParams.gravity = Gravity.TOP;
-        // add Dialer UI To ViewActivity  
+        // add Dialer UI To ViewActivity
         wm.addView(tDialerView, wmParams);
         log.debug("tDialer Started");
     }
@@ -288,8 +291,33 @@ public class CallService extends Service {
         ContextCompat.startForegroundService(getBaseContext(), intentService);
         if (media != null && media.recState.equalsIgnoreCase("ON")) {
             media.stopRecording();
+            rec.setStopTime(System.currentTimeMillis());
         }
+        stopForeground(true);
+        log.info("CallService Stopped");
         super.onDestroy();
+    }
+
+    private Notification buildForegroundNotification(String filename) {
+        Intent notificationIntent = new Intent(getApplicationContext(), ViewActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                notificationIntent,
+                0);
+
+        //To notify : setting icon in case of recording in background
+        Notification builder = new NotificationCompat.Builder(getApplicationContext(),
+                ApplicationExtension.BACK_CHANNEL_ID)
+                .setOngoing(true)
+                .setContentText(filename)
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setTicker("On-going Call")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
+
+        return builder;
     }
 
 }

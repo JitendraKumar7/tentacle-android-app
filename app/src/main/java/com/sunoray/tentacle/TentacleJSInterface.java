@@ -24,7 +24,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -129,13 +129,8 @@ public class TentacleJSInterface {
 
     @JavascriptInterface
     public void disconnectCall() {
-        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         try {
-            Method m1 = tm.getClass().getDeclaredMethod("getITelephony");
-            m1.setAccessible(true);
-            Object iTelephony = m1.invoke(tm);
-            Method m3 = iTelephony.getClass().getDeclaredMethod("endCall");
-            m3.invoke(iTelephony);
+            Util.endCall(context);
         } catch (Exception e) {
             log.info("Exception @ End call", e);
         }
@@ -169,12 +164,14 @@ public class TentacleJSInterface {
                 rec.setServerType(host);
                 rec.setCallId(unique_call_id);
                 if (dh.updateRecordingInbound(rec) > 0) {
-                    String fullPath = StorageHandler.getFileDirPath(context, AppProperties.DEVICE_RECORDING_PATH).getAbsolutePath() + File.separator + unique_call_id + MediaRecording.file_exts[MediaRecording.currentFormat];
-                    if (Util.renameFile(context, rec.getPath(), fullPath)) {
-                        rec.setStatus("NEW");
-                        rec.setPath(fullPath);
-                        dh.updateRecordingInbound(rec);
+                    if (rec.getPath() != null && rec.getPath().length() > 0) {
+                        String fullPath = StorageHandler.getFileDirPath(context, AppProperties.DEVICE_RECORDING_PATH).getAbsolutePath() + File.separator + unique_call_id + MediaRecording.file_exts[MediaRecording.currentFormat];
+                        if (Util.renameFile(context, rec.getPath(), fullPath)) {
+                            rec.setPath(fullPath);
+                        }
                     }
+                    rec.setStatus("NEW");
+                    dh.updateRecordingInbound(rec);
                     Intent intentService = new Intent(context, BackGroundService.class);
                     ContextCompat.startForegroundService(context, intentService);
                 }

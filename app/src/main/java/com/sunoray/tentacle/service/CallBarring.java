@@ -76,6 +76,7 @@ public class CallBarring extends PhoneCallReceiver {
                     media = new MediaRecording(context, rec.getPhoneNumber() + "_" + System.currentTimeMillis());
                     if (recordingOption.equals("0")) {
                         media.startRecording(rec.getAudioSrc());
+                        rec.setStartTime(System.currentTimeMillis());
                     }
                 } else
                     log.debug("Incoming Call Recorder: Call already in Progress. Cant Take new recording request");
@@ -87,6 +88,7 @@ public class CallBarring extends PhoneCallReceiver {
             isRecording = false;
             if (media != null && media.recState.equalsIgnoreCase("ON")) {
                 media.stopRecording();
+                rec.setStopTime(System.currentTimeMillis());
             }
         }
     }
@@ -97,6 +99,7 @@ public class CallBarring extends PhoneCallReceiver {
                 if (recordingOption.equals("0")) {
                     media.stopRecording();
                     rec.setPath(media.getFilename());
+                    rec.setStopTime(System.currentTimeMillis());
                 }
                 DatabaseHandler dh = new DatabaseHandler(context);
                 rec.setId(dh.addRecording(rec));
@@ -121,6 +124,7 @@ public class CallBarring extends PhoneCallReceiver {
             isRecording = false;
             if (media != null && media.recState.equalsIgnoreCase("ON")) {
                 media.stopRecording();
+                rec.setStopTime(System.currentTimeMillis());
             }
         }
     }
