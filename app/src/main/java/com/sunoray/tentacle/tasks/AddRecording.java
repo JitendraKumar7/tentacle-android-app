@@ -67,24 +67,34 @@ public class AddRecording extends AsyncTask<Recording, Void, String> {
             int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission_group.CONTACTS);
             // Setting Call Duration to rec
             Log.d("Timer-test",rec.getStopTime() +"-"+ rec.getStartTime()+"="+(rec.getStopTime() - rec.getStartTime()));
-            if(rec.getStopTime() - rec.getStartTime() <= 0) {
-                HashMap<String, String> phoneCallLogDetails = getLastOutCall(rec.getPhoneNumber());
-                if (phoneCallLogDetails != null) {
+                HashMap<String, String> phoneCallLogDetails = getLastOutCall(rec.getPhoneNumber(), Long.toString(rec.getStartTime()+5000L));
+                int recTime = (int)(rec.getStopTime() - rec.getStartTime())/1000;
+                if (phoneCallLogDetails != null && phoneCallLogDetails.get(CallLog.Calls.DURATION) != null && !phoneCallLogDetails.get(CallLog.Calls.DURATION).equals("")) {
                     log.debug("ID: "+rec.getCallId() + " | Number " + phoneCallLogDetails.get(CallLog.Calls.NUMBER) + " | Type " + phoneCallLogDetails.get(CallLog.Calls.TYPE) + " | Duration " + phoneCallLogDetails.get(CallLog.Calls.DURATION));
-                    if (phoneCallLogDetails.get(CallLog.Calls.DURATION) == null || phoneCallLogDetails.get(CallLog.Calls.DURATION).equals(""))
-                        rec.setDuration(0);
-                    else
-                        rec.setDuration(Integer.parseInt(phoneCallLogDetails.get(CallLog.Calls.DURATION)));
 
+                    int dur = Integer.parseInt(phoneCallLogDetails.get(CallLog.Calls.DURATION));
+                    if(dur<=2 ){
+                        rec.setDuration(0);
+                    } else if(Math.abs(dur -recTime) <= 5) {
+                        rec.setDuration(dur);
+                    }
+                    else if(recTime>2){
+                        rec.setDuration(recTime);
+                    }
+                    else{
+                        rec.setDuration(0);
+                    }
                     // For Hide Number - Removing Number for Phone Log If Its there
                     if (Util.makeNumberHiding(rec.getHideNumber()))
                         removeCallBaseOnId(phoneCallLogDetails.get(CallLog.Calls._ID));
                 } else {
-                    rec.setDuration(0);
+                    if(recTime>2){
+                        rec.setDuration(recTime);
+                    }
+                    else{
+                        rec.setDuration(0);
+                    }
                 }
-            } else {
-                rec.setDuration((int)(rec.getStopTime() - rec.getStartTime())/1000);
-            }
 
             if (rec.getDirection() != null && rec.getDirection().equalsIgnoreCase("Inbound")) {
                 rec.setStatus("INBOUND");
@@ -112,7 +122,7 @@ public class AddRecording extends AsyncTask<Recording, Void, String> {
         context.getContentResolver().delete(CallLog.Calls.CONTENT_URI,CallLog.Calls._ID + "= ? ", new String[]{String.valueOf(callId)});
     }
 
-    private HashMap<String, String> getLastOutCall(String number) {
+    private HashMap<String, String> getLastOutCall(String number, String startTimeWithDelta) {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -121,7 +131,7 @@ public class AddRecording extends AsyncTask<Recording, Void, String> {
 
         try {
             HashMap<String, String> callData = new HashMap<String, String>();
-            String strSelection = CallLog.Calls.NUMBER + " LIKE '%" + number + "'";
+            String strSelection = CallLog.Calls.NUMBER + " LIKE '%" + number + "' AND " +CallLog.Calls.DATE +"< " + startTimeWithDelta;
             String strOrder = CallLog.Calls.DATE + " DESC LIMIT 1";
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
                 int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG);
