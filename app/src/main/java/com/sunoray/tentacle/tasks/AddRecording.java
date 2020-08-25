@@ -73,7 +73,9 @@ public class AddRecording extends AsyncTask<Recording, Void, String> {
                     log.debug("ID: "+rec.getCallId() + " | Number " + phoneCallLogDetails.get(CallLog.Calls.NUMBER) + " | Type " + phoneCallLogDetails.get(CallLog.Calls.TYPE) + " | Duration " + phoneCallLogDetails.get(CallLog.Calls.DURATION));
 
                     int dur = Integer.parseInt(phoneCallLogDetails.get(CallLog.Calls.DURATION));
-                    if(dur>=2 && Math.abs(dur -recTime) <= 5) {
+                    if(dur<=2 ){
+                        rec.setDuration(0);
+                    } else if(Math.abs(dur -recTime) <= 5) {
                         rec.setDuration(dur);
                     }
                     else if(recTime>2){
