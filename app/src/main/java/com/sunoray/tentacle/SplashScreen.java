@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.crashlytics.android.Crashlytics;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import java.io.File;
+
 import io.fabric.sdk.android.Fabric;
 import rx.functions.Action1;
 
@@ -25,20 +27,56 @@ public class SplashScreen extends AppCompatActivity {
 
         Fabric.with(this, new Crashlytics());
 
-        Thread background = new Thread() {
-            public void run() {
-                try {
-                    sleep(1 * 1000);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        CheckPermissionsWithAnswerCall();
-                    else
-                        CheckPermissions();
-                } catch (Exception e) {
+        if(isRooted()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreen.this);
+            builder.setTitle("Alert");
+            builder.setMessage("This device is Rooted. You can't use this app!");
+
+            builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SplashScreen.this.finishAffinity();
+                }
+            });
+            builder.show();
+        }
+        else{
+            Thread background = new Thread() {
+                public void run() {
+                    try {
+                        sleep(1 * 1000);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            CheckPermissionsWithAnswerCall();
+                        else
+                            CheckPermissions();
+                    } catch (Exception e) {
+                    }
+                }
+            };
+            // start thread
+            background.start();
+        }
+
+    }
+
+    public static boolean findBinary(String binaryName) {
+        boolean found = false;
+        if (!found) {
+            String[] places = { "/sbin/", "/system/bin/", "/system/xbin/",
+                    "/data/local/xbin/", "/data/local/bin/",
+                    "/system/sd/xbin/", "/system/bin/failsafe/", "/data/local/" };
+            for (String where : places) {
+                if (new File(where + binaryName).exists()) {
+                    found = true;
+
+                    break;
                 }
             }
-        };
-        // start thread
-        background.start();
+        }
+        return found;
+    }
+    private static boolean isRooted() {
+        return findBinary("su");
     }
 
     public void initialize(boolean isAppInitialized) {
