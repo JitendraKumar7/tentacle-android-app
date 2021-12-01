@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -28,7 +30,12 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.legacy.content.WakefulBroadcastReceiver;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener;
+
+import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -128,7 +135,6 @@ public class ViewActivity extends Activity {
         }
         // Text Zoom base on Screen Size
         tentacleBrowser.getSettings().setTextZoom(getResources().getInteger(R.integer.view_activity_webview_font));
-
         // Setting UserAgent
         try {
             tentacleBrowser.getSettings().setUserAgentString(tentacleBrowser.getSettings().getUserAgentString() + " " + "Tentacle/" + String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionName) + ")");
@@ -142,6 +148,37 @@ public class ViewActivity extends Activity {
         tentacleBrowser.getSettings().setDomStorageEnabled(true);
         tentacleBrowser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         tentacleBrowser.setWebViewClient(new MyBrowser());
+
+        tentacleBrowser.setDownloadListener(new DownloadListener()
+        {
+
+            @Override
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimeType,
+                                        long contentLength) {
+                Log.d("URL", url);
+                //if(!url.endsWith(".csv")) return;
+
+                DownloadManager.Request request = new DownloadManager.Request(
+                        Uri.parse(url));
+                request.setMimeType(mimeType);
+                String cookies = CookieManager.getInstance().getCookie(url);
+                request.addRequestHeader("cookie", cookies);
+                request.addRequestHeader("User-Agent", userAgent);
+                request.setDescription("Downloading file...");
+                request.setTitle(URLUtil.guessFileName(url, contentDisposition,
+                        mimeType));
+                request.allowScanningByMediaScanner();
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(
+                                url, contentDisposition, mimeType));
+                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                dm.enqueue(request);
+                Toast.makeText(getApplicationContext(), "Downloading File",
+                        Toast.LENGTH_LONG).show();
+            }});
+
         if (Build.VERSION.SDK_INT > 17) {
             tentacleBrowser.getSettings().setMediaPlaybackRequiresUserGesture(false);
         }
@@ -201,11 +238,9 @@ public class ViewActivity extends Activity {
             }
         });
         // FILE BROWSER END ========================================
-
         try {
             String url = currentURL;
             String goTo = Util.isNull(getIntent().getExtras().getString("goTo")) ? "" : getIntent().getExtras().getString("goTo");
-
             if (getIntent().getData() != null) {
                 // if redirected to application form from thirdPartyApp
                 Toast.makeText(this, "Redirecting", Toast.LENGTH_SHORT).show();
@@ -382,9 +417,23 @@ public class ViewActivity extends Activity {
     }
 
     private class MyBrowser extends WebViewClient {
-
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Log.e("URL",url);
+//            if(url.endsWith(".csv")) {
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                intent.setPackage("com.android.chrome");
+//                try {
+//                    Log.d("URL", "onClick: inTryBrowser");
+//                    startActivity(intent);
+//                } catch (ActivityNotFoundException ex) {
+//                    Log.e("URL", "onClick: in inCatchBrowser", ex );
+//                    intent.setPackage(null);
+//                    startActivity(Intent.createChooser(intent, "Select Browser"));
+//                }
+//            }
+
 
             if (APP_TYPE.equalsIgnoreCase("staging"))
                 Toast.makeText(getApplicationContext(), url, Toast.LENGTH_LONG).show();
