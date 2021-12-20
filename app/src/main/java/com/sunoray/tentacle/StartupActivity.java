@@ -1,9 +1,11 @@
 package com.sunoray.tentacle;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -120,7 +123,7 @@ public class StartupActivity extends Activity {
         retry = (Button) findViewById(R.id.startup_btn_retry);
 
         pb.setEnabled(true);
-
+        Log.d("TOKEN",PreferenceUtil.getSharedPreferences(this, PreferenceUtil.AUTHTOKEN, ""));
         checkAppPrerequisite();
 
         retry.setOnClickListener(new OnClickListener() {
@@ -475,9 +478,17 @@ public class StartupActivity extends Activity {
                     keyValuePairs.put("Manufacturer", android.os.Build.MANUFACTURER);
                     keyValuePairs.put("Model", android.os.Build.MODEL);
                     keyValuePairs.put("OSVersion", android.os.Build.VERSION.RELEASE);
-                    keyValuePairs.put("IMEI", Util.isNull(telephonyManager.getDeviceId()) ? "null" : telephonyManager.getDeviceId());
+                    //need to check android 10
+                    if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+                        // Do something for Q and above versions
+                        keyValuePairs.put("IMEI", Util.isNull(telephonyManager.getDeviceId()) ? "null" : telephonyManager.getDeviceId());
+
+                    }
+                    //
                     keyValuePairs.put("appversion", String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode));
                     keyValuePairs.put("appversionname", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+
+                    keyValuePairs.forEach((key, value) -> Log.d("KEY",key + " : " + value));
 
                     // Making HTTP Request
                     HttpServices httpService = new HttpServices();
@@ -508,10 +519,12 @@ public class StartupActivity extends Activity {
                         renderAfterReg();
                         return;
                     } else {
+
                         pb.setVisibility(View.GONE);
-                        alert.setText("Try after sometime");
+                        alert.setText("Try after sometime first else");
                         retry.setVisibility(View.VISIBLE);
                         log.info("pin not got = " + resp);
+                        Log.d("pin not got",resp);
                         return;
                     }
 
@@ -526,7 +539,7 @@ public class StartupActivity extends Activity {
                 retry.setVisibility(View.GONE);
             }
         } catch (Exception e) {
-            log.debug(e.toString());
+            Log.d("Exception",e.toString());
         } finally {
 
         }
