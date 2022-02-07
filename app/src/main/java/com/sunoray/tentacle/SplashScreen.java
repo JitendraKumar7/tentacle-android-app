@@ -28,17 +28,31 @@ public class SplashScreen extends AppCompatActivity {
         Fabric.with(this, new Crashlytics());
 
         if(isRooted()){
-            AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreen.this);
-            builder.setTitle("Alert");
-            builder.setMessage("This device is Rooted. You can't use this app!");
-
-            builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    SplashScreen.this.finishAffinity();
+            Thread background = new Thread() {
+                public void run() {
+                    try {
+                        sleep(1 * 1000);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            CheckPermissionsWithAnswerCall();
+                        else
+                            CheckPermissions();
+                    } catch (Exception e) {
+                    }
                 }
-            });
-            builder.show();
+            };
+            // start thread
+            background.start();
+//            AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreen.this);
+//            builder.setTitle("Alert");
+//            builder.setMessage("This device is Rooted. You can't use this app!");
+//
+//            builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    SplashScreen.this.finishAffinity();
+//                }
+//            });
+//            builder.show();
         }
         else{
             Thread background = new Thread() {

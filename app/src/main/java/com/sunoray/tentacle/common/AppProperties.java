@@ -2,12 +2,12 @@ package com.sunoray.tentacle.common;
 
 public class AppProperties {
 	
-	public static final String APP_TYPE = "production"; 									// staging | production
+	public static final String APP_TYPE = "staging"; 									// staging | production
 	public static final String PREFERANCE_FILENAME_STRING = "sunoray.tentacle.appfile";
 	public static final String PROJECT_ID = APP_TYPE.equalsIgnoreCase("production") ? "375051463289" : "49812070842";
 	public static final String QUEUE_FILENAME_STRING = "tentacle.queue";
 
-	public static final String WEB_APP_URL 		= APP_TYPE.equalsIgnoreCase("production") ? "https://tentacle.sunoray.net" : "https://tentaclecrm.herokuapp.com";				//  http://tentacle.sunoray.net | http://tentaclecrm.herokuapp.com
+	public static final String WEB_APP_URL 		= APP_TYPE.equalsIgnoreCase("production") ? "https://tentacle.sunoray.net" : "https://tentacle-stag-gcp.sunoray.net/";				//  http://tentacle.sunoray.net | http://tentaclecrm.herokuapp.com
 	public static final String MEDIA_SERVER_URL = APP_TYPE.equalsIgnoreCase("production") ? "http://tentaclecall.sunoray.net" : "http://tentaclecall.sunoray.net";			//	http://drive.sunoray.net 	| http://192.168.0.21:8080
 	public static final String SIGN_UP_PAGE 	= "/sales/sign_up?source=Android";
 	
